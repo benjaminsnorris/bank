@@ -1,0 +1,42 @@
+// Main App
+    function BankApp() {
+      var stateResult = useReducer(gameReducer, initialGameState);
+      var state = stateResult[0];
+      var dispatch = stateResult[1];
+      var roundEndState = useState(false);
+      var showRoundEnd = roundEndState[0];
+      var setShowRoundEnd = roundEndState[1];
+      var bustState = useState(false);
+      var wasBust = bustState[0];
+      var setWasBust = bustState[1];
+
+      useEffect(function() {
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) dispatch({ type: 'TOGGLE_SETTING', setting: 'darkMode' });
+      }, []);
+
+      useEffect(function() {
+        if (state.settings.darkMode) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      }, [state.settings.darkMode]);
+
+      useEffect(function() {
+        if (state.phase === 'roundEnd') { setWasBust(state.lastRollEffect === 'BUST!'); setShowRoundEnd(true); }
+      }, [state.phase, state.lastRollEffect]);
+
+      var handleRoundContinue = function() { setShowRoundEnd(false); dispatch({ type: 'END_ROUND' }); };
+
+      if (state.phase === 'setup') return React.createElement(SetupScreen, { state: state, dispatch: dispatch });
+      if (state.phase === 'gameOver') return React.createElement(FinalResults, { players: state.players, stats: state.stats, onPlayAgain: function() { dispatch({ type: 'NEW_GAME_SAME_PLAYERS' }); }, onNewGame: function() { dispatch({ type: 'NEW_GAME' }); } });
+
+      return React.createElement(React.Fragment, null,
+        React.createElement(GameScreen, { state: state, dispatch: dispatch }),
+        showRoundEnd && React.createElement(RoundEndModal, { players: state.players, roundNumber: state.currentRound, isBust: wasBust, onContinue: handleRoundContinue })
+      );
+    }
+
+    var root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(BankApp));
+  </script>
+</body>
+</html>
