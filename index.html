@@ -89,6 +89,33 @@
     .icon-btn-subtle { color: var(--text-secondary); }
     .icon-btn-subtle:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
     .dark .icon-btn-subtle:hover { background: rgba(255,255,255,0.1); }
+
+    /* Settings popover */
+    .settings-popover-wrapper { position: relative; }
+    .settings-popover { position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: var(--bg-secondary); border-radius: 0.75rem; box-shadow: var(--shadow-lg); min-width: 14rem; z-index: 100; border: 1px solid var(--border-color); overflow: hidden; }
+    .settings-popover-backdrop { position: fixed; inset: 0; z-index: 99; }
+    .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; gap: 1rem; }
+    .settings-item:not(:last-child) { border-bottom: 1px solid var(--border-color); }
+    .settings-item-label { font-size: 0.875rem; font-weight: 500; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; }
+    .settings-item-sublabel { font-size: 0.75rem; color: var(--text-secondary); }
+    .settings-item-danger { color: #dc2626; }
+    .settings-item-btn { background: none; border: none; padding: 0.75rem 1rem; width: 100%; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--text-primary); font-family: inherit; }
+    .settings-item-btn:hover { background: var(--bg-tertiary); }
+    .settings-item-btn.danger { color: #dc2626; }
+    .settings-item-btn.danger:hover { background: rgba(220, 38, 38, 0.1); }
+
+    /* Toggle switch */
+    .toggle { position: relative; width: 2.5rem; height: 1.5rem; background: var(--bg-tertiary); border-radius: 0.75rem; cursor: pointer; transition: background 0.2s; border: 2px solid var(--border-color); }
+    .toggle.active { background: var(--text-accent); border-color: var(--text-accent); }
+    .toggle-knob { position: absolute; top: 2px; left: 2px; width: 1rem; height: 1rem; background: white; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .toggle.active .toggle-knob { transform: translateX(1rem); }
+
+    /* Rounds stepper */
+    .rounds-stepper { display: flex; align-items: center; gap: 0.5rem; }
+    .rounds-stepper-btn { width: 1.75rem; height: 1.75rem; border-radius: 0.375rem; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 600; }
+    .rounds-stepper-btn:hover:not(:disabled) { background: var(--bg-secondary); border-color: var(--text-accent); }
+    .rounds-stepper-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .rounds-stepper-value { min-width: 2rem; text-align: center; font-weight: 600; font-size: 0.875rem; }
     
     .card { background: var(--bg-secondary); border-radius: 1rem; box-shadow: var(--shadow-md); }.input { width: 100%; padding: 0.75rem 1rem; border-radius: 0.75rem; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 1rem; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .input:focus { border-color: var(--text-accent); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15); }
@@ -142,13 +169,27 @@
     .auto-dismiss-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.25rem; }
 
     .player-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; background: var(--bg-tertiary); transition: all 0.2s; position: relative; border: 2px solid transparent; }
-    .player-card.banked { opacity: 0.5; }
+    .player-card.banked { opacity: 1; }
     .player-card.current-turn { background: rgba(5, 150, 105, 0.15); border-color: var(--text-accent); }
     .player-card.dragging { opacity: 0.8; box-shadow: var(--shadow-lg); z-index: 10; transform: scale(1.02); }
     .player-card.drag-over { border-color: var(--text-accent); border-style: dashed; }
     .player-card-indicator { position: absolute; left: -2px; top: 50%; transform: translateY(-50%); width: 4px; height: 2rem; background: var(--text-accent); border-radius: 2px; }
-    .drag-handle { color: var(--text-secondary); cursor: grab; touch-action: none; padding: 0.25rem; display: flex; align-items: center; }
+
+    /* Turn order badge */
+    .turn-badge { width: 1.5rem; height: 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; background: var(--bg-secondary); color: var(--text-secondary); border: 2px solid var(--bg-secondary); flex-shrink: 0; }
+    .turn-badge.current { background: var(--text-accent); color: white; border-color: var(--text-accent); }
+    .turn-badge.banked { opacity: 0.5; }
+
+    /* Score display */
+    .score-section { text-align: right; min-width: 4.5rem; }
+    .score-main { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
+    .score-main.potential { color: var(--text-secondary); font-style: italic; }
+    .score-breakdown { font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; }
+    .score-gain { color: var(--text-accent); font-weight: 600; }
+    .score-gain.potential { color: var(--text-secondary); font-weight: 400; }
+    .drag-handle { color: var(--text-secondary); cursor: grab; touch-action: none; padding: 0.25rem; display: flex; align-items: center; user-select: none; -webkit-user-select: none; }
     .drag-handle:active { cursor: grabbing; }
+    .player-card.pointer-dragging { opacity: 0.5; }
     
     /* Bank score card with inline effect */
     .bank-card { position: relative; }
@@ -216,12 +257,131 @@
     .game-controls { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; flex-shrink: 0; }
     .game-sidebar { flex: 1; min-height: 0; overflow-y: auto; }
     
-    @media (min-width: 768px) { 
-      .game-layout { flex-direction: row !important; } 
-      .game-main { flex: 1; flex-shrink: 1; } 
-      .game-sidebar { width: 280px; flex-shrink: 0; flex: none; } 
+    @media (min-width: 768px) {
+      .game-layout { flex-direction: row !important; }
+      .game-main { flex: 1; flex-shrink: 1; }
+      .game-sidebar { width: 280px; flex-shrink: 0; flex: none; }
     }
-    
+
+    /* Landscape mobile - two column layout with both scrollable */
+    @media (orientation: landscape) and (max-height: 500px) {
+      .header { padding: 0.375rem 0.75rem; }
+      .header-title { font-size: 1.125rem; }
+      .header-round { font-size: 0.875rem; padding: 0.125rem 0.5rem; }
+      .brand-icon { width: 24px; height: 24px; }
+      .app-footer { display: none; }
+
+      .game-layout {
+        flex-direction: row !important;
+        padding: 0.5rem;
+        gap: 0.5rem;
+      }
+      .game-main {
+        flex: 1;
+        flex-shrink: 1;
+        overflow-y: auto;
+        min-height: 0;
+      }
+      .game-sidebar {
+        width: 200px;
+        flex-shrink: 0;
+        flex: none;
+        overflow-y: auto;
+      }
+      .game-sidebar.card { padding: 0.5rem; }
+      .game-sidebar h2 { font-size: 0.875rem; margin-bottom: 0.375rem; }
+
+      /* Compact bank card */
+      .bank-card { padding: 0.5rem !important; }
+      .bank-number { font-size: 2.5rem; }
+      .bank-card-header { top: 0.25rem; right: 0.25rem; }
+
+      /* Compact controls */
+      .game-controls { gap: 0.375rem; }
+      .turn-indicator { font-size: 0.875rem; }
+      .keypad-container { height: 5rem; max-width: 18rem; }
+      .keypad-btn { font-size: 0.875rem; padding: 0.25rem; }
+      .dice-container { height: 5rem; max-width: 18rem; padding: 0.5rem; gap: 0.75rem; }
+      .die { width: 3.5rem; height: 3.5rem; }
+      .pip { width: 8px; height: 8px; }
+      .bank-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+
+      /* Compact player cards */
+      .player-card { padding: 0.5rem; gap: 0.5rem; }
+      .turn-badge { width: 1.25rem; height: 1.25rem; font-size: 0.625rem; }
+      .score-section { min-width: 3.5rem; }
+      .score-main { font-size: 1rem; }
+      .score-breakdown { font-size: 0.6rem; }
+    }
+
+    /* Extra short landscape (very limited height) */
+    @media (orientation: landscape) and (max-height: 380px) {
+      .header { padding: 0.25rem 0.5rem; }
+      .bank-number { font-size: 2rem; }
+      .keypad-container { height: 4rem; }
+      .dice-container { height: 4rem; }
+      .die { width: 2.75rem; height: 2.75rem; }
+      .pip { width: 6px; height: 6px; }
+    }
+
+    /* Tablet and larger screens - bigger controls */
+    @media (min-width: 768px) and (min-height: 600px) {
+      .game-layout { padding: 1.5rem; gap: 1.5rem; }
+      .game-main { gap: 1.25rem; }
+      .game-controls { gap: 1rem; }
+
+      /* Larger bank display */
+      .bank-card { padding: 2rem !important; }
+      .bank-number { font-size: 5rem; }
+      .bank-score-row { gap: 1.25rem; }
+      .effect-pill { font-size: 1rem; padding: 0.375rem 0.75rem; }
+
+      /* Larger keypad */
+      .keypad-container { max-width: 32rem; height: 12rem; }
+      .keypad-grid { gap: 0.75rem; }
+      .keypad-btn { font-size: 1.5rem; border-radius: 1rem; }
+      .keypad-btn-seven span { font-size: 2rem !important; }
+
+      /* Larger dice */
+      .dice-container { max-width: 32rem; height: 12rem; gap: 2rem; padding: 1.5rem 2rem; border-radius: 1.25rem; }
+      .die { width: 7rem; height: 7rem; border-radius: 1rem; }
+      .pip { width: 14px; height: 14px; }
+
+      /* Larger bank button */
+      .bank-btn { max-width: 32rem; padding: 1.5rem 2rem; font-size: 1.375rem; border-radius: 1.25rem; }
+
+      /* Larger turn indicator */
+      .turn-indicator { font-size: 1.5rem; }
+
+      /* Larger player cards */
+      .game-sidebar { width: 320px; }
+      .game-sidebar.card { padding: 1.25rem; }
+      .game-sidebar h2 { font-size: 1.25rem; }
+      .player-card { padding: 1rem; gap: 1rem; }
+      .turn-badge { width: 2rem; height: 2rem; font-size: 0.875rem; }
+      .score-main { font-size: 1.5rem; }
+      .score-breakdown { font-size: 0.8rem; }
+    }
+
+    /* Extra large screens - even bigger */
+    @media (min-width: 1024px) and (min-height: 700px) {
+      .game-layout { padding: 2rem; gap: 2rem; }
+
+      .bank-card { padding: 2.5rem !important; }
+      .bank-number { font-size: 6rem; }
+
+      .keypad-container { max-width: 36rem; height: 14rem; }
+      .keypad-btn { font-size: 1.75rem; }
+
+      .dice-container { max-width: 36rem; height: 14rem; }
+      .die { width: 8rem; height: 8rem; }
+      .pip { width: 16px; height: 16px; }
+
+      .bank-btn { max-width: 36rem; padding: 1.75rem 2.5rem; font-size: 1.5rem; }
+
+      .game-sidebar { width: 360px; }
+    }
+
     /* Footer */
     .app-footer { flex-shrink: 0; padding: 0.5rem 1rem 1rem; display: flex; justify-content: center; }
     .footer-link { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.625rem; border-radius: 0.375rem; background: transparent; border: none; color: var(--text-secondary); font-size: 0.75rem; font-family: inherit; cursor: pointer; transition: all 0.2s; text-decoration: none; opacity: 0.7; }
@@ -271,7 +431,8 @@
     function Home(p) { return React.createElement(Icon, p, React.createElement('path', {d: 'm3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'}), React.createElement('polyline', {points: '9 22 9 12 15 12 15 22'})); }
     function RefreshCw(p) { return React.createElement(Icon, p, React.createElement('path', {d: 'M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8'}), React.createElement('path', {d: 'M21 3v5h-5'}), React.createElement('path', {d: 'M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16'}), React.createElement('path', {d: 'M8 16H3v5'})); }
     function BankIcon(p) { var size = p.size || 20; return React.createElement('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.5, strokeLinecap: 'square', strokeLinejoin: 'round', width: size, height: size, style: p.style }, React.createElement('circle', {cx: 12, cy: 12, r: 8}), React.createElement('path', {d: 'M12 6v2'}), React.createElement('path', {d: 'M12 16v2'}), React.createElement('path', {d: 'M8 10h8'}), React.createElement('path', {d: 'M8 14h8'})); }
-    function ExternalLink(p) { return React.createElement(Icon, p, React.createElement('path', {d: 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'}), React.createElement('polyline', {points: '15 3 21 3 21 9'}), React.createElement('line', {x1: 10, y1: 14, x2: 21, y2: 3})); }// Constants
+    function ExternalLink(p) { return React.createElement(Icon, p, React.createElement('path', {d: 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'}), React.createElement('polyline', {points: '15 3 21 3 21 9'}), React.createElement('line', {x1: 10, y1: 14, x2: 21, y2: 3})); }
+    function Hash(p) { return React.createElement(Icon, p, React.createElement('line', {x1: 4, y1: 9, x2: 20, y2: 9}), React.createElement('line', {x1: 4, y1: 15, x2: 20, y2: 15}), React.createElement('line', {x1: 10, y1: 3, x2: 8, y2: 21}), React.createElement('line', {x1: 16, y1: 3, x2: 14, y2: 21})); }// Constants
     var ROUND_PRESETS = [10, 15, 20];
     var MAX_PLAYERS = 20;
     var MIN_PLAYERS = 2;
@@ -426,6 +587,8 @@
             players: state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: 0, roundScore: null, hasBanked: false }); }),
             stats: { totalSevens: 0, totalDoubles: 0, biggestBank: 0, biggestBankPlayer: null }
           });
+        case 'GO_TO_SETUP':
+          return Object.assign({}, initialGameState, { settings: state.settings, players: state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: 0, roundScore: null, hasBanked: false }); }) });
         case 'NEW_GAME':
           return Object.assign({}, initialGameState, { settings: state.settings });
         default:
@@ -603,48 +766,65 @@
           )
         )
       );
-    }// Player Card for setup - with simpler drag implementation
+    }// Player Card for setup - with pointer-based drag implementation
     function SetupPlayerCard(props) {
       var player = props.player;
       var index = props.index;
       var onRemove = props.onRemove;
-      var onDragStart = props.onDragStart;
-      var onDragOver = props.onDragOver;
-      var onDragEnd = props.onDragEnd;
+      var onPointerDragStart = props.onPointerDragStart;
+      var onPointerMove = props.onPointerMove;
+      var onPointerDragEnd = props.onPointerDragEnd;
       var isDragging = props.isDragging;
       var isDragOver = props.isDragOver;
+      var isAnyDragging = props.isAnyDragging;
+
+      var handlePointerDown = function(e) {
+        // Only handle primary button (left click / single touch)
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.target.setPointerCapture(e.pointerId);
+        onPointerDragStart(index, e.pointerId);
+      };
+
+      var handlePointerMove = function(e) {
+        if (!isAnyDragging) return;
+        // Find element under pointer (excluding current dragging element)
+        var elem = document.elementFromPoint(e.clientX, e.clientY);
+        if (elem) {
+          var card = elem.closest('.player-card');
+          if (card) {
+            var cards = Array.from(document.querySelectorAll('.player-card'));
+            var targetIndex = cards.indexOf(card);
+            if (targetIndex !== -1) onPointerMove(targetIndex);
+          }
+        }
+      };
+
+      var handlePointerUp = function(e) {
+        e.target.releasePointerCapture(e.pointerId);
+        onPointerDragEnd();
+      };
 
       return React.createElement('div', {
-        className: 'player-card' + (isDragging ? ' dragging' : '') + (isDragOver ? ' drag-over' : ''),
-        draggable: true,
-        onDragStart: function(e) { e.dataTransfer.effectAllowed = 'move'; onDragStart(index); },
-        onDragOver: function(e) { e.preventDefault(); onDragOver(index); },
-        onDragEnd: onDragEnd,
-        onTouchStart: function(e) { onDragStart(index); },
-        onTouchMove: function(e) {
-          var touch = e.touches[0];
-          var elem = document.elementFromPoint(touch.clientX, touch.clientY);
-          if (elem) {
-            var card = elem.closest('.player-card');
-            if (card) {
-              var cards = Array.from(document.querySelectorAll('.player-card'));
-              var targetIndex = cards.indexOf(card);
-              if (targetIndex !== -1) onDragOver(targetIndex);
-            }
-          }
-        },
-        onTouchEnd: onDragEnd
+        className: 'player-card' + (isDragging ? ' dragging pointer-dragging' : '') + (isDragOver ? ' drag-over' : ''),
+        'data-index': index
       },
-        React.createElement('div', { className: 'drag-handle' },
+        React.createElement('div', {
+          className: 'drag-handle',
+          onPointerDown: handlePointerDown,
+          onPointerMove: handlePointerMove,
+          onPointerUp: handlePointerUp,
+          onPointerCancel: handlePointerUp
+        },
           React.createElement(GripVertical, { size: 20 })
         ),
         React.createElement('div', { className: 'flex-1 min-w-0' },
           React.createElement('span', { className: 'font-semibold truncate', style: { display: 'block' } }, player.name)
         ),
-        React.createElement('button', { 
-          onClick: function(e) { e.stopPropagation(); onRemove(player.id); }, 
-          className: 'icon-btn', 
-          style: { color: 'var(--text-secondary)' } 
+        React.createElement('button', {
+          onClick: function(e) { e.stopPropagation(); onRemove(player.id); },
+          className: 'icon-btn',
+          style: { color: 'var(--text-secondary)' }
         },
           React.createElement(Trash2, { size: 18 })
         )
@@ -654,18 +834,40 @@
     // Player Card for game
     function PlayerCard(props) {
       var player = props.player;
+      var turnOrder = props.turnOrder;
       var isCurrentTurn = props.isCurrentTurn;
-      return React.createElement('div', { className: 'player-card' + (player.hasBanked ? ' banked' : '') + (isCurrentTurn && !player.hasBanked ? ' current-turn' : '') },
-        isCurrentTurn && !player.hasBanked && React.createElement('div', { className: 'player-card-indicator' }),
+      var bankTotal = props.bankTotal;
+
+      var baseScore = player.cumulativeScore;
+      var hasBanked = player.hasBanked;
+      var roundGain = hasBanked ? player.roundScore : bankTotal;
+      var totalScore = baseScore + roundGain;
+
+      var turnBadgeClass = 'turn-badge' + (isCurrentTurn && !hasBanked ? ' current' : '') + (hasBanked ? ' banked' : '');
+      var cardClass = 'player-card' + (hasBanked ? ' banked' : '') + (isCurrentTurn && !hasBanked ? ' current-turn' : '');
+
+      return React.createElement('div', { className: cardClass },
+        isCurrentTurn && !hasBanked && React.createElement('div', { className: 'player-card-indicator' }),
+        // Turn order badge
+        React.createElement('div', { className: turnBadgeClass }, turnOrder),
+        // Name and status
         React.createElement('div', { className: 'flex-1 min-w-0' },
           React.createElement('div', { className: 'flex items-center gap-2' },
             React.createElement('span', { className: 'font-semibold truncate' }, player.name),
-            player.hasBanked && React.createElement(Lock, { size: 14, style: { color: 'var(--text-accent)' } })
-          ),
-          player.roundScore !== null && React.createElement('div', { style: { fontSize: '0.875rem', color: 'var(--text-accent)' } }, '+' + player.roundScore + ' this round')
+            hasBanked && React.createElement(Lock, { size: 14, style: { color: 'var(--text-accent)' } })
+          )
         ),
-        React.createElement('div', { className: 'text-right' },
-          React.createElement('div', { className: 'text-2xl font-bold' }, player.cumulativeScore)
+        // Score section
+        React.createElement('div', { className: 'score-section' },
+          React.createElement('div', { className: 'score-main' + (hasBanked ? '' : ' potential') },
+            hasBanked ? totalScore : '~' + totalScore
+          ),
+          React.createElement('div', { className: 'score-breakdown' },
+            baseScore + ' ',
+            React.createElement('span', { className: 'score-gain' + (hasBanked ? '' : ' potential') },
+              '+ ' + roundGain
+            )
+          )
         )
       );
     }
@@ -687,7 +889,92 @@
           React.createElement('span', null, 'App by Ben Norris')
         )
       );
-    }// Banking Modal
+    }
+
+    // Game Settings Popover
+    function GameSettingsPopover(props) {
+      var isOpen = props.isOpen;
+      var onClose = props.onClose;
+      var state = props.state;
+      var dispatch = props.dispatch;
+      var onRestart = props.onRestart;
+
+      if (!isOpen) return null;
+
+      var minRounds = state.currentRound;
+      var maxRounds = 99;
+
+      var handleRoundsChange = function(delta) {
+        var newRounds = Math.max(minRounds, Math.min(maxRounds, state.roundConfig + delta));
+        if (newRounds !== state.roundConfig) {
+          dispatch({ type: 'SET_ROUND_CONFIG', rounds: newRounds, isCustom: true });
+        }
+      };
+
+      return React.createElement(React.Fragment, null,
+        React.createElement('div', { className: 'settings-popover-backdrop', onClick: onClose }),
+        React.createElement('div', { className: 'settings-popover' },
+          // Virtual Dice toggle
+          React.createElement('div', { className: 'settings-item' },
+            React.createElement('div', null,
+              React.createElement('div', { className: 'settings-item-label' }, React.createElement(Dices, { size: 16 }), 'Virtual Dice'),
+              React.createElement('div', { className: 'settings-item-sublabel' }, 'Roll dice on screen')
+            ),
+            React.createElement('div', {
+              className: 'toggle' + (state.settings.virtualDice ? ' active' : ''),
+              onClick: function() { dispatch({ type: 'TOGGLE_SETTING', setting: 'virtualDice' }); }
+            },
+              React.createElement('div', { className: 'toggle-knob' })
+            )
+          ),
+          // Theme toggle
+          React.createElement('div', { className: 'settings-item' },
+            React.createElement('div', null,
+              React.createElement('div', { className: 'settings-item-label' },
+                state.settings.darkMode ? React.createElement(Moon, { size: 16 }) : React.createElement(Sun, { size: 16 }),
+                'Dark Mode'
+              )
+            ),
+            React.createElement('div', {
+              className: 'toggle' + (state.settings.darkMode ? ' active' : ''),
+              onClick: function() { dispatch({ type: 'TOGGLE_SETTING', setting: 'darkMode' }); }
+            },
+              React.createElement('div', { className: 'toggle-knob' })
+            )
+          ),
+          // Rounds stepper
+          React.createElement('div', { className: 'settings-item' },
+            React.createElement('div', null,
+              React.createElement('div', { className: 'settings-item-label' }, React.createElement(Hash, { size: 16 }), 'Rounds'),
+              React.createElement('div', { className: 'settings-item-sublabel' }, 'Min: ' + minRounds + ' (current)')
+            ),
+            React.createElement('div', { className: 'rounds-stepper' },
+              React.createElement('button', {
+                className: 'rounds-stepper-btn',
+                onClick: function() { handleRoundsChange(-1); },
+                disabled: state.roundConfig <= minRounds
+              }, '−'),
+              React.createElement('span', { className: 'rounds-stepper-value' }, state.roundConfig),
+              React.createElement('button', {
+                className: 'rounds-stepper-btn',
+                onClick: function() { handleRoundsChange(1); },
+                disabled: state.roundConfig >= maxRounds
+              }, '+')
+            )
+          ),
+          // Restart button
+          React.createElement('button', {
+            className: 'settings-item-btn danger',
+            onClick: function() { onClose(); onRestart(); }
+          },
+            React.createElement(Home, { size: 16 }),
+            'End Game'
+          )
+        )
+      );
+    }
+
+    // Banking Modal
     function BankingModal(props) {
       var players = props.players;
       var bankTotal = props.bankTotal;
@@ -913,7 +1200,7 @@
                 shareStatus === 'copied' ? ' Copied!' : shareStatus === 'shared' ? ' Shared!' : shareStatus === 'error' ? ' Failed to copy' : ' Share Results'
               ),
               React.createElement('button', { onClick: onPlayAgain, className: 'btn btn-primary w-full btn-large' }, React.createElement(RotateCcw, { size: 20 }), ' Play Again'),
-              React.createElement('button', { onClick: onNewGame, className: 'btn btn-ghost w-full' }, 'New Game (Change Players)')
+              React.createElement('button', { onClick: onNewGame, className: 'btn btn-ghost w-full' }, 'Edit Players')
             )
           )
         ),
@@ -943,24 +1230,24 @@
         }
       };
 
-      var handleDragStart = function(index) {
-        setDragInfo({ draggingIndex: index, dragOverIndex: null });
+      var handlePointerDragStart = function(index, pointerId) {
+        setDragInfo({ draggingIndex: index, dragOverIndex: null, pointerId: pointerId });
       };
 
-      var handleDragOver = function(index) {
+      var handlePointerMove = function(index) {
         if (dragInfo.draggingIndex !== null && dragInfo.draggingIndex !== index) {
           setDragInfo(function(prev) { return Object.assign({}, prev, { dragOverIndex: index }); });
         }
       };
 
-      var handleDragEnd = function() {
+      var handlePointerDragEnd = function() {
         if (dragInfo.draggingIndex !== null && dragInfo.dragOverIndex !== null && dragInfo.draggingIndex !== dragInfo.dragOverIndex) {
           var newPlayers = state.players.slice();
           var item = newPlayers.splice(dragInfo.draggingIndex, 1)[0];
           newPlayers.splice(dragInfo.dragOverIndex, 0, item);
           dispatch({ type: 'REORDER_PLAYERS', players: newPlayers });
         }
-        setDragInfo({ draggingIndex: null, dragOverIndex: null });
+        setDragInfo({ draggingIndex: null, dragOverIndex: null, pointerId: null });
       };
 
       var handlePresetClick = function(rounds) {
@@ -1007,16 +1294,17 @@
                 state.players.length === 0 ?
                   React.createElement('div', { className: 'text-center py-8', style: { color: 'var(--text-secondary)' } }, 'Add at least ' + MIN_PLAYERS + ' players to start') :
                   state.players.map(function(player, index) {
-                    return React.createElement(SetupPlayerCard, { 
-                      key: player.id, 
-                      player: player, 
+                    return React.createElement(SetupPlayerCard, {
+                      key: player.id,
+                      player: player,
                       index: index,
                       onRemove: function(id) { dispatch({ type: 'REMOVE_PLAYER', id: id }); },
-                      onDragStart: handleDragStart,
-                      onDragOver: handleDragOver,
-                      onDragEnd: handleDragEnd,
+                      onPointerDragStart: handlePointerDragStart,
+                      onPointerMove: handlePointerMove,
+                      onPointerDragEnd: handlePointerDragEnd,
                       isDragging: dragInfo.draggingIndex === index,
-                      isDragOver: dragInfo.dragOverIndex === index
+                      isDragOver: dragInfo.dragOverIndex === index,
+                      isAnyDragging: dragInfo.draggingIndex !== null
                     });
                   })
               )
@@ -1072,6 +1360,9 @@
       var restartState = useState(false);
       var showRestartConfirm = restartState[0];
       var setShowRestartConfirm = restartState[1];
+      var settingsState = useState(false);
+      var showSettings = settingsState[0];
+      var setShowSettings = settingsState[1];
       var wideScreenState = useState(window.innerWidth >= 768);
       var isWideScreen = wideScreenState[0];
       var setIsWideScreen = wideScreenState[1];
@@ -1114,10 +1405,15 @@
               ),
               React.createElement('div', { className: 'header-round' }, 'Round ' + state.currentRound + '/' + state.roundConfig)
             ),
-            React.createElement('div', { className: 'header-right' },
-              React.createElement('button', { onClick: function() { setShowRestartConfirm(true); }, className: 'icon-btn', title: 'Restart Game' }, React.createElement(Home, { size: 18 })),
-              React.createElement('button', { onClick: function() { dispatch({ type: 'TOGGLE_SETTING', setting: 'darkMode' }); }, className: 'icon-btn' },
-                state.settings.darkMode ? React.createElement(Sun, { size: 18 }) : React.createElement(Moon, { size: 18 })
+            React.createElement('div', { className: 'header-right settings-popover-wrapper' },
+              React.createElement('button', { onClick: function() { setShowSettings(!showSettings); }, className: 'icon-btn', title: 'Settings' }, React.createElement(Settings, { size: 18 })),
+              React.createElement(GameSettingsPopover, {
+                isOpen: showSettings,
+                onClose: function() { setShowSettings(false); },
+                state: state,
+                dispatch: dispatch,
+                onRestart: function() { setShowRestartConfirm(true); }
+              }
               )
             )
           )
@@ -1170,13 +1466,28 @@
               )
             )
           ),
-          // Player sidebar
+          // Player sidebar - sorted by effective score
           React.createElement('div', { className: 'game-sidebar card p-4' },
             React.createElement('h2', { className: 'text-lg font-bold mb-3 flex items-center gap-2' }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players'),
             React.createElement('div', { className: 'flex flex-col gap-2' },
-              state.players.map(function(player, index) {
-                return React.createElement(PlayerCard, { key: player.id, player: player, isCurrentTurn: index === state.currentPlayerIndex && !player.hasBanked });
-              })
+              state.players
+                .map(function(player, index) { return { player: player, originalIndex: index }; })
+                .sort(function(a, b) {
+                  var scoreA = a.player.cumulativeScore + (a.player.hasBanked ? a.player.roundScore : state.bankTotal);
+                  var scoreB = b.player.cumulativeScore + (b.player.hasBanked ? b.player.roundScore : state.bankTotal);
+                  return scoreB - scoreA;
+                })
+                .map(function(item) {
+                  var player = item.player;
+                  var originalIndex = item.originalIndex;
+                  return React.createElement(PlayerCard, {
+                    key: player.id,
+                    player: player,
+                    turnOrder: originalIndex + 1,
+                    isCurrentTurn: originalIndex === state.currentPlayerIndex,
+                    bankTotal: state.bankTotal
+                  });
+                })
             )
           )
         ),
@@ -1187,10 +1498,10 @@
             React.createElement('div', { className: 'p-6 text-center' },
               React.createElement(RefreshCw, { size: 48, style: { color: 'var(--text-accent)', margin: '0 auto 1rem' } }),
               React.createElement('h2', { className: 'text-xl font-bold mb-2' }, 'Restart Game?'),
-              React.createElement('p', { style: { color: 'var(--text-secondary)', marginBottom: '1.5rem' } }, 'This will end the current game and return to setup.'),
+              React.createElement('p', { style: { color: 'var(--text-secondary)', marginBottom: '1.5rem' } }, 'This will end the current game and return to setup. Your players will be kept.'),
               React.createElement('div', { className: 'flex gap-3' },
                 React.createElement('button', { onClick: function() { setShowRestartConfirm(false); }, className: 'btn btn-secondary flex-1' }, 'Cancel'),
-                React.createElement('button', { onClick: function() { dispatch({ type: 'NEW_GAME' }); }, className: 'btn btn-danger flex-1' }, 'Restart')
+                React.createElement('button', { onClick: function() { dispatch({ type: 'GO_TO_SETUP' }); }, className: 'btn btn-danger flex-1' }, 'End Game')
               )
             )
           )
@@ -1225,7 +1536,7 @@
       var handleRoundContinue = function() { setShowRoundEnd(false); dispatch({ type: 'END_ROUND' }); };
 
       if (state.phase === 'setup') return React.createElement(SetupScreen, { state: state, dispatch: dispatch });
-      if (state.phase === 'gameOver') return React.createElement(FinalResults, { players: state.players, stats: state.stats, onPlayAgain: function() { dispatch({ type: 'NEW_GAME_SAME_PLAYERS' }); }, onNewGame: function() { dispatch({ type: 'NEW_GAME' }); } });
+      if (state.phase === 'gameOver') return React.createElement(FinalResults, { players: state.players, stats: state.stats, onPlayAgain: function() { dispatch({ type: 'NEW_GAME_SAME_PLAYERS' }); }, onNewGame: function() { dispatch({ type: 'GO_TO_SETUP' }); } });
 
       return React.createElement(React.Fragment, null,
         React.createElement(GameScreen, { state: state, dispatch: dispatch }),
