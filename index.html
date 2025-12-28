@@ -142,11 +142,24 @@
     .auto-dismiss-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.25rem; }
 
     .player-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; background: var(--bg-tertiary); transition: all 0.2s; position: relative; border: 2px solid transparent; }
-    .player-card.banked { opacity: 0.5; }
+    .player-card.banked { opacity: 1; }
     .player-card.current-turn { background: rgba(5, 150, 105, 0.15); border-color: var(--text-accent); }
     .player-card.dragging { opacity: 0.8; box-shadow: var(--shadow-lg); z-index: 10; transform: scale(1.02); }
     .player-card.drag-over { border-color: var(--text-accent); border-style: dashed; }
     .player-card-indicator { position: absolute; left: -2px; top: 50%; transform: translateY(-50%); width: 4px; height: 2rem; background: var(--text-accent); border-radius: 2px; }
+
+    /* Turn order badge */
+    .turn-badge { width: 1.5rem; height: 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; background: var(--bg-secondary); color: var(--text-secondary); border: 2px solid var(--bg-secondary); flex-shrink: 0; }
+    .turn-badge.current { background: var(--text-accent); color: white; border-color: var(--text-accent); }
+    .turn-badge.banked { opacity: 0.5; }
+
+    /* Score display */
+    .score-section { text-align: right; min-width: 4.5rem; }
+    .score-main { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
+    .score-main.potential { color: var(--text-secondary); font-style: italic; }
+    .score-breakdown { font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; }
+    .score-gain { color: var(--text-accent); font-weight: 600; }
+    .score-gain.potential { color: var(--text-secondary); font-weight: 400; }
     .drag-handle { color: var(--text-secondary); cursor: grab; touch-action: none; padding: 0.25rem; display: flex; align-items: center; user-select: none; -webkit-user-select: none; }
     .drag-handle:active { cursor: grabbing; }
     .player-card.pointer-dragging { opacity: 0.5; }
@@ -674,18 +687,40 @@
     // Player Card for game
     function PlayerCard(props) {
       var player = props.player;
+      var turnOrder = props.turnOrder;
       var isCurrentTurn = props.isCurrentTurn;
-      return React.createElement('div', { className: 'player-card' + (player.hasBanked ? ' banked' : '') + (isCurrentTurn && !player.hasBanked ? ' current-turn' : '') },
-        isCurrentTurn && !player.hasBanked && React.createElement('div', { className: 'player-card-indicator' }),
+      var bankTotal = props.bankTotal;
+
+      var baseScore = player.cumulativeScore;
+      var hasBanked = player.hasBanked;
+      var roundGain = hasBanked ? player.roundScore : bankTotal;
+      var totalScore = baseScore + roundGain;
+
+      var turnBadgeClass = 'turn-badge' + (isCurrentTurn && !hasBanked ? ' current' : '') + (hasBanked ? ' banked' : '');
+      var cardClass = 'player-card' + (hasBanked ? ' banked' : '') + (isCurrentTurn && !hasBanked ? ' current-turn' : '');
+
+      return React.createElement('div', { className: cardClass },
+        isCurrentTurn && !hasBanked && React.createElement('div', { className: 'player-card-indicator' }),
+        // Turn order badge
+        React.createElement('div', { className: turnBadgeClass }, turnOrder),
+        // Name and status
         React.createElement('div', { className: 'flex-1 min-w-0' },
           React.createElement('div', { className: 'flex items-center gap-2' },
             React.createElement('span', { className: 'font-semibold truncate' }, player.name),
-            player.hasBanked && React.createElement(Lock, { size: 14, style: { color: 'var(--text-accent)' } })
-          ),
-          player.roundScore !== null && React.createElement('div', { style: { fontSize: '0.875rem', color: 'var(--text-accent)' } }, '+' + player.roundScore + ' this round')
+            hasBanked && React.createElement(Lock, { size: 14, style: { color: 'var(--text-accent)' } })
+          )
         ),
-        React.createElement('div', { className: 'text-right' },
-          React.createElement('div', { className: 'text-2xl font-bold' }, player.cumulativeScore)
+        // Score section
+        React.createElement('div', { className: 'score-section' },
+          React.createElement('div', { className: 'score-main' + (hasBanked ? '' : ' potential') },
+            hasBanked ? totalScore : '~' + totalScore
+          ),
+          React.createElement('div', { className: 'score-breakdown' },
+            baseScore + ' ',
+            React.createElement('span', { className: 'score-gain' + (hasBanked ? '' : ' potential') },
+              '+ ' + roundGain
+            )
+          )
         )
       );
     }
@@ -1191,13 +1226,28 @@
               )
             )
           ),
-          // Player sidebar
+          // Player sidebar - sorted by effective score
           React.createElement('div', { className: 'game-sidebar card p-4' },
             React.createElement('h2', { className: 'text-lg font-bold mb-3 flex items-center gap-2' }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players'),
             React.createElement('div', { className: 'flex flex-col gap-2' },
-              state.players.map(function(player, index) {
-                return React.createElement(PlayerCard, { key: player.id, player: player, isCurrentTurn: index === state.currentPlayerIndex && !player.hasBanked });
-              })
+              state.players
+                .map(function(player, index) { return { player: player, originalIndex: index }; })
+                .sort(function(a, b) {
+                  var scoreA = a.player.cumulativeScore + (a.player.hasBanked ? a.player.roundScore : state.bankTotal);
+                  var scoreB = b.player.cumulativeScore + (b.player.hasBanked ? b.player.roundScore : state.bankTotal);
+                  return scoreB - scoreA;
+                })
+                .map(function(item) {
+                  var player = item.player;
+                  var originalIndex = item.originalIndex;
+                  return React.createElement(PlayerCard, {
+                    key: player.id,
+                    player: player,
+                    turnOrder: originalIndex + 1,
+                    isCurrentTurn: originalIndex === state.currentPlayerIndex,
+                    bankTotal: state.bankTotal
+                  });
+                })
             )
           )
         ),
