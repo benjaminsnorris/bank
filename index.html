@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://bennorris.com/bank/">
   <meta property="og:title" content="Bank - Dice Game Scorekeeper">
   <meta property="og:description" content="A beautiful, intuitive scorekeeper for the Bank dice game. Perfect for family game night!">
-  <meta property="og:image" content="https://bennorris.com/assets/images/bank-preview.png">
+  <meta property="og:image" content="https://bennorris.com/bank/assets/bank-preview.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   
@@ -21,14 +21,14 @@
   <meta name="twitter:url" content="https://bennorris.com/bank/">
   <meta name="twitter:title" content="Bank - Dice Game Scorekeeper">
   <meta name="twitter:description" content="A beautiful, intuitive scorekeeper for the Bank dice game. Perfect for family game night!">
-  <meta name="twitter:image" content="https://bennorris.com/assets/images/bank-preview.png">
+  <meta name="twitter:image" content="https://bennorris.com/bank/assets/bank-preview.png">
   
   <!-- Apple -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Bank">
-  <link rel="apple-touch-icon" href="https://bennorris.com/assets/images/bank-icon.png">
-  <link rel="icon" type="image/png" href="https://bennorris.com/assets/images/bank-icon.png">
+  <link rel="apple-touch-icon" href="assets/bank-icon.png">
+  <link rel="icon" type="image/png" href="assets/bank-icon.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -136,7 +136,11 @@
     .round-result-score { font-weight: 700; }
     .round-result-score.positive { color: #059669; }
     .round-result-score.zero { color: #dc2626; }
-    
+
+    .auto-dismiss-btn { position: relative; overflow: hidden; }
+    .auto-dismiss-progress { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255,255,255,0.2); transition: width 0.15s linear; pointer-events: none; }
+    .auto-dismiss-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.25rem; }
+
     .player-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; background: var(--bg-tertiary); transition: all 0.2s; position: relative; border: 2px solid transparent; }
     .player-card.banked { opacity: 0.5; }
     .player-card.current-turn { background: rgba(5, 150, 105, 0.15); border-color: var(--text-accent); }
@@ -393,7 +397,13 @@
           });
           var allBanked = newPlayers.every(function(p) { return p.hasBanked; });
           var activePlayers = newPlayers.filter(function(p) { return !p.hasBanked; });
-          var nextPlayerIndex = activePlayers.length > 0 ? newPlayers.findIndex(function(p) { return p.id === activePlayers[0].id; }) : state.currentPlayerIndex;
+          var nextPlayerIndex = state.currentPlayerIndex;
+          if (activePlayers.length > 0) {
+            for (var i = 1; i <= newPlayers.length; i++) {
+              var checkIndex = (state.currentPlayerIndex + i) % newPlayers.length;
+              if (!newPlayers[checkIndex].hasBanked) { nextPlayerIndex = checkIndex; break; }
+            }
+          }
           return Object.assign({}, state, { players: newPlayers, phase: allBanked ? 'roundEnd' : state.phase, currentPlayerIndex: nextPlayerIndex, stats: newStats,
             history: state.history.concat([{ type: 'bank', prevPlayers: state.players, prevStats: state.stats }])
           });
@@ -401,7 +411,8 @@
         case 'END_ROUND': {
           var newPlayers = state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: p.cumulativeScore + (p.roundScore || 0), roundScore: null, hasBanked: false }); });
           var isGameOver = state.currentRound >= state.roundConfig;
-          return Object.assign({}, state, { players: newPlayers, phase: isGameOver ? 'gameOver' : 'playing', currentRound: isGameOver ? state.currentRound : state.currentRound + 1, rollCount: 0, bankTotal: 0, currentPlayerIndex: 0, lastRoll: null, lastRollEffect: null, history: [] });
+          var nextPlayerIndex = (state.currentPlayerIndex + 1) % newPlayers.length;
+          return Object.assign({}, state, { players: newPlayers, phase: isGameOver ? 'gameOver' : 'playing', currentRound: isGameOver ? state.currentRound : state.currentRound + 1, rollCount: 0, bankTotal: 0, currentPlayerIndex: nextPlayerIndex, lastRoll: null, lastRollEffect: null, history: [] });
         }
         case 'UNDO':
           if (state.history.length === 0) return state;
@@ -737,7 +748,25 @@
       var sortedPlayers = players.slice().sort(function(a, b) { return (b.roundScore || 0) - (a.roundScore || 0); });
       var topScore = sortedPlayers[0] ? sortedPlayers[0].roundScore : 0;
 
+      var AUTO_DISMISS_SECONDS = 4;
+      var countdownState = useState(AUTO_DISMISS_SECONDS);
+      var countdown = countdownState[0];
+      var setCountdown = countdownState[1];
+
       useScrollLock(true);
+
+      useEffect(function() {
+        if (countdown <= 0) {
+          onContinue();
+          return;
+        }
+        var timer = setTimeout(function() {
+          setCountdown(countdown - 1);
+        }, 1000);
+        return function() { clearTimeout(timer); };
+      }, [countdown, onContinue]);
+
+      var progressPercent = (countdown / AUTO_DISMISS_SECONDS) * 100;
 
       return React.createElement('div', { className: 'modal-backdrop' },
         React.createElement('div', { className: 'modal-content' },
@@ -754,8 +783,8 @@
             sortedPlayers.map(function(player) {
               var isWinner = player.roundScore > 0 && player.roundScore === topScore;
               var scoreClass = player.roundScore > 0 ? 'positive' : 'zero';
-              return React.createElement('div', { 
-                key: player.id, 
+              return React.createElement('div', {
+                key: player.id,
                 className: 'round-result-row' + (isWinner ? ' winner' : '')
               },
                 React.createElement('div', { className: 'round-result-name' },
@@ -767,8 +796,11 @@
             })
           ),
           React.createElement('div', { className: 'modal-footer' },
-            React.createElement('button', { onClick: onContinue, className: 'btn btn-primary w-full' },
-              'Continue ', React.createElement(ChevronRight, { size: 20 })
+            React.createElement('button', { onClick: onContinue, className: 'btn btn-primary w-full auto-dismiss-btn' },
+              React.createElement('span', { className: 'auto-dismiss-progress', style: { width: progressPercent + '%' } }),
+              React.createElement('span', { className: 'auto-dismiss-content' },
+                'Continue (' + countdown + 's) ', React.createElement(ChevronRight, { size: 20 })
+              )
             )
           )
         )
