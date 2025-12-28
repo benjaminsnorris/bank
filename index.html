@@ -426,6 +426,8 @@
             players: state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: 0, roundScore: null, hasBanked: false }); }),
             stats: { totalSevens: 0, totalDoubles: 0, biggestBank: 0, biggestBankPlayer: null }
           });
+        case 'GO_TO_SETUP':
+          return Object.assign({}, initialGameState, { settings: state.settings, players: state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: 0, roundScore: null, hasBanked: false }); }) });
         case 'NEW_GAME':
           return Object.assign({}, initialGameState, { settings: state.settings });
         default:
@@ -913,7 +915,7 @@
                 shareStatus === 'copied' ? ' Copied!' : shareStatus === 'shared' ? ' Shared!' : shareStatus === 'error' ? ' Failed to copy' : ' Share Results'
               ),
               React.createElement('button', { onClick: onPlayAgain, className: 'btn btn-primary w-full btn-large' }, React.createElement(RotateCcw, { size: 20 }), ' Play Again'),
-              React.createElement('button', { onClick: onNewGame, className: 'btn btn-ghost w-full' }, 'New Game (Change Players)')
+              React.createElement('button', { onClick: onNewGame, className: 'btn btn-ghost w-full' }, 'Edit Players')
             )
           )
         ),
@@ -1187,10 +1189,10 @@
             React.createElement('div', { className: 'p-6 text-center' },
               React.createElement(RefreshCw, { size: 48, style: { color: 'var(--text-accent)', margin: '0 auto 1rem' } }),
               React.createElement('h2', { className: 'text-xl font-bold mb-2' }, 'Restart Game?'),
-              React.createElement('p', { style: { color: 'var(--text-secondary)', marginBottom: '1.5rem' } }, 'This will end the current game and return to setup.'),
+              React.createElement('p', { style: { color: 'var(--text-secondary)', marginBottom: '1.5rem' } }, 'This will end the current game and return to setup. Your players will be kept.'),
               React.createElement('div', { className: 'flex gap-3' },
                 React.createElement('button', { onClick: function() { setShowRestartConfirm(false); }, className: 'btn btn-secondary flex-1' }, 'Cancel'),
-                React.createElement('button', { onClick: function() { dispatch({ type: 'NEW_GAME' }); }, className: 'btn btn-danger flex-1' }, 'Restart')
+                React.createElement('button', { onClick: function() { dispatch({ type: 'GO_TO_SETUP' }); }, className: 'btn btn-danger flex-1' }, 'End Game')
               )
             )
           )
@@ -1225,7 +1227,7 @@
       var handleRoundContinue = function() { setShowRoundEnd(false); dispatch({ type: 'END_ROUND' }); };
 
       if (state.phase === 'setup') return React.createElement(SetupScreen, { state: state, dispatch: dispatch });
-      if (state.phase === 'gameOver') return React.createElement(FinalResults, { players: state.players, stats: state.stats, onPlayAgain: function() { dispatch({ type: 'NEW_GAME_SAME_PLAYERS' }); }, onNewGame: function() { dispatch({ type: 'NEW_GAME' }); } });
+      if (state.phase === 'gameOver') return React.createElement(FinalResults, { players: state.players, stats: state.stats, onPlayAgain: function() { dispatch({ type: 'NEW_GAME_SAME_PLAYERS' }); }, onNewGame: function() { dispatch({ type: 'GO_TO_SETUP' }); } });
 
       return React.createElement(React.Fragment, null,
         React.createElement(GameScreen, { state: state, dispatch: dispatch }),
