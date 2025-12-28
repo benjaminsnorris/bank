@@ -393,7 +393,13 @@
           });
           var allBanked = newPlayers.every(function(p) { return p.hasBanked; });
           var activePlayers = newPlayers.filter(function(p) { return !p.hasBanked; });
-          var nextPlayerIndex = activePlayers.length > 0 ? newPlayers.findIndex(function(p) { return p.id === activePlayers[0].id; }) : state.currentPlayerIndex;
+          var nextPlayerIndex = state.currentPlayerIndex;
+          if (activePlayers.length > 0) {
+            for (var i = 1; i <= newPlayers.length; i++) {
+              var checkIndex = (state.currentPlayerIndex + i) % newPlayers.length;
+              if (!newPlayers[checkIndex].hasBanked) { nextPlayerIndex = checkIndex; break; }
+            }
+          }
           return Object.assign({}, state, { players: newPlayers, phase: allBanked ? 'roundEnd' : state.phase, currentPlayerIndex: nextPlayerIndex, stats: newStats,
             history: state.history.concat([{ type: 'bank', prevPlayers: state.players, prevStats: state.stats }])
           });
@@ -401,7 +407,8 @@
         case 'END_ROUND': {
           var newPlayers = state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: p.cumulativeScore + (p.roundScore || 0), roundScore: null, hasBanked: false }); });
           var isGameOver = state.currentRound >= state.roundConfig;
-          return Object.assign({}, state, { players: newPlayers, phase: isGameOver ? 'gameOver' : 'playing', currentRound: isGameOver ? state.currentRound : state.currentRound + 1, rollCount: 0, bankTotal: 0, currentPlayerIndex: 0, lastRoll: null, lastRollEffect: null, history: [] });
+          var nextPlayerIndex = (state.currentPlayerIndex + 1) % newPlayers.length;
+          return Object.assign({}, state, { players: newPlayers, phase: isGameOver ? 'gameOver' : 'playing', currentRound: isGameOver ? state.currentRound : state.currentRound + 1, rollCount: 0, bankTotal: 0, currentPlayerIndex: nextPlayerIndex, lastRoll: null, lastRollEffect: null, history: [] });
         }
         case 'UNDO':
           if (state.history.length === 0) return state;
