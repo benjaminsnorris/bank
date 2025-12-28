@@ -641,7 +641,10 @@
           var allBanked = newPlayers.every(function(p) { return p.hasBanked; });
           var activePlayers = newPlayers.filter(function(p) { return !p.hasBanked; });
           var nextPlayerIndex = state.currentPlayerIndex;
-          if (activePlayers.length > 0) {
+          // Only advance turn if the current player is among those who just banked
+          var currentPlayerId = state.players[state.currentPlayerIndex].id;
+          var currentPlayerBanked = action.playerIds.indexOf(currentPlayerId) !== -1;
+          if (currentPlayerBanked && activePlayers.length > 0) {
             for (var i = 1; i <= newPlayers.length; i++) {
               var checkIndex = (state.currentPlayerIndex + i) % newPlayers.length;
               if (!newPlayers[checkIndex].hasBanked) { nextPlayerIndex = checkIndex; break; }
