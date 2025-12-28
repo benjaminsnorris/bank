@@ -418,8 +418,11 @@
     .dark .footer-link:hover { background: rgba(255,255,255,0.05); }
     .footer-logo { width: 16px; height: 16px; border-radius: 3px; object-fit: contain; }
 
-    /* Hide footer on portrait mobile to maximize game UI space */
+    /* Hide footer on mobile to maximize game UI space */
     @media (orientation: portrait) and (max-width: 600px) {
+      .app-footer { display: none; }
+    }
+    @media (orientation: landscape) and (max-height: 600px) {
       .app-footer { display: none; }
     }
 
