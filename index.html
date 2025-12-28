@@ -257,10 +257,71 @@
     .game-controls { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; flex-shrink: 0; }
     .game-sidebar { flex: 1; min-height: 0; overflow-y: auto; }
     
-    @media (min-width: 768px) { 
-      .game-layout { flex-direction: row !important; } 
-      .game-main { flex: 1; flex-shrink: 1; } 
-      .game-sidebar { width: 280px; flex-shrink: 0; flex: none; } 
+    @media (min-width: 768px) {
+      .game-layout { flex-direction: row !important; }
+      .game-main { flex: 1; flex-shrink: 1; }
+      .game-sidebar { width: 280px; flex-shrink: 0; flex: none; }
+    }
+
+    /* Landscape mobile - two column layout with both scrollable */
+    @media (orientation: landscape) and (max-height: 500px) {
+      .header { padding: 0.375rem 0.75rem; }
+      .header-title { font-size: 1.125rem; }
+      .header-round { font-size: 0.875rem; padding: 0.125rem 0.5rem; }
+      .brand-icon { width: 24px; height: 24px; }
+      .app-footer { display: none; }
+
+      .game-layout {
+        flex-direction: row !important;
+        padding: 0.5rem;
+        gap: 0.5rem;
+      }
+      .game-main {
+        flex: 1;
+        flex-shrink: 1;
+        overflow-y: auto;
+        min-height: 0;
+      }
+      .game-sidebar {
+        width: 200px;
+        flex-shrink: 0;
+        flex: none;
+        overflow-y: auto;
+      }
+      .game-sidebar.card { padding: 0.5rem; }
+      .game-sidebar h2 { font-size: 0.875rem; margin-bottom: 0.375rem; }
+
+      /* Compact bank card */
+      .bank-card { padding: 0.5rem !important; }
+      .bank-number { font-size: 2.5rem; }
+      .bank-card-header { top: 0.25rem; right: 0.25rem; }
+
+      /* Compact controls */
+      .game-controls { gap: 0.375rem; }
+      .turn-indicator { font-size: 0.875rem; }
+      .keypad-container { height: 5rem; max-width: 18rem; }
+      .keypad-btn { font-size: 0.875rem; padding: 0.25rem; }
+      .dice-container { height: 5rem; max-width: 18rem; padding: 0.5rem; gap: 0.75rem; }
+      .die { width: 3.5rem; height: 3.5rem; }
+      .pip { width: 8px; height: 8px; }
+      .bank-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+
+      /* Compact player cards */
+      .player-card { padding: 0.5rem; gap: 0.5rem; }
+      .turn-badge { width: 1.25rem; height: 1.25rem; font-size: 0.625rem; }
+      .score-section { min-width: 3.5rem; }
+      .score-main { font-size: 1rem; }
+      .score-breakdown { font-size: 0.6rem; }
+    }
+
+    /* Extra short landscape (very limited height) */
+    @media (orientation: landscape) and (max-height: 380px) {
+      .header { padding: 0.25rem 0.5rem; }
+      .bank-number { font-size: 2rem; }
+      .keypad-container { height: 4rem; }
+      .dice-container { height: 4rem; }
+      .die { width: 2.75rem; height: 2.75rem; }
+      .pip { width: 6px; height: 6px; }
     }
     
     /* Footer */
