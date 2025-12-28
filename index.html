@@ -147,8 +147,9 @@
     .player-card.dragging { opacity: 0.8; box-shadow: var(--shadow-lg); z-index: 10; transform: scale(1.02); }
     .player-card.drag-over { border-color: var(--text-accent); border-style: dashed; }
     .player-card-indicator { position: absolute; left: -2px; top: 50%; transform: translateY(-50%); width: 4px; height: 2rem; background: var(--text-accent); border-radius: 2px; }
-    .drag-handle { color: var(--text-secondary); cursor: grab; touch-action: none; padding: 0.25rem; display: flex; align-items: center; }
+    .drag-handle { color: var(--text-secondary); cursor: grab; touch-action: none; padding: 0.25rem; display: flex; align-items: center; user-select: none; -webkit-user-select: none; }
     .drag-handle:active { cursor: grabbing; }
+    .player-card.pointer-dragging { opacity: 0.5; }
     
     /* Bank score card with inline effect */
     .bank-card { position: relative; }
@@ -605,48 +606,65 @@
           )
         )
       );
-    }// Player Card for setup - with simpler drag implementation
+    }// Player Card for setup - with pointer-based drag implementation
     function SetupPlayerCard(props) {
       var player = props.player;
       var index = props.index;
       var onRemove = props.onRemove;
-      var onDragStart = props.onDragStart;
-      var onDragOver = props.onDragOver;
-      var onDragEnd = props.onDragEnd;
+      var onPointerDragStart = props.onPointerDragStart;
+      var onPointerMove = props.onPointerMove;
+      var onPointerDragEnd = props.onPointerDragEnd;
       var isDragging = props.isDragging;
       var isDragOver = props.isDragOver;
+      var isAnyDragging = props.isAnyDragging;
+
+      var handlePointerDown = function(e) {
+        // Only handle primary button (left click / single touch)
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.target.setPointerCapture(e.pointerId);
+        onPointerDragStart(index, e.pointerId);
+      };
+
+      var handlePointerMove = function(e) {
+        if (!isAnyDragging) return;
+        // Find element under pointer (excluding current dragging element)
+        var elem = document.elementFromPoint(e.clientX, e.clientY);
+        if (elem) {
+          var card = elem.closest('.player-card');
+          if (card) {
+            var cards = Array.from(document.querySelectorAll('.player-card'));
+            var targetIndex = cards.indexOf(card);
+            if (targetIndex !== -1) onPointerMove(targetIndex);
+          }
+        }
+      };
+
+      var handlePointerUp = function(e) {
+        e.target.releasePointerCapture(e.pointerId);
+        onPointerDragEnd();
+      };
 
       return React.createElement('div', {
-        className: 'player-card' + (isDragging ? ' dragging' : '') + (isDragOver ? ' drag-over' : ''),
-        draggable: true,
-        onDragStart: function(e) { e.dataTransfer.effectAllowed = 'move'; onDragStart(index); },
-        onDragOver: function(e) { e.preventDefault(); onDragOver(index); },
-        onDragEnd: onDragEnd,
-        onTouchStart: function(e) { onDragStart(index); },
-        onTouchMove: function(e) {
-          var touch = e.touches[0];
-          var elem = document.elementFromPoint(touch.clientX, touch.clientY);
-          if (elem) {
-            var card = elem.closest('.player-card');
-            if (card) {
-              var cards = Array.from(document.querySelectorAll('.player-card'));
-              var targetIndex = cards.indexOf(card);
-              if (targetIndex !== -1) onDragOver(targetIndex);
-            }
-          }
-        },
-        onTouchEnd: onDragEnd
+        className: 'player-card' + (isDragging ? ' dragging pointer-dragging' : '') + (isDragOver ? ' drag-over' : ''),
+        'data-index': index
       },
-        React.createElement('div', { className: 'drag-handle' },
+        React.createElement('div', {
+          className: 'drag-handle',
+          onPointerDown: handlePointerDown,
+          onPointerMove: handlePointerMove,
+          onPointerUp: handlePointerUp,
+          onPointerCancel: handlePointerUp
+        },
           React.createElement(GripVertical, { size: 20 })
         ),
         React.createElement('div', { className: 'flex-1 min-w-0' },
           React.createElement('span', { className: 'font-semibold truncate', style: { display: 'block' } }, player.name)
         ),
-        React.createElement('button', { 
-          onClick: function(e) { e.stopPropagation(); onRemove(player.id); }, 
-          className: 'icon-btn', 
-          style: { color: 'var(--text-secondary)' } 
+        React.createElement('button', {
+          onClick: function(e) { e.stopPropagation(); onRemove(player.id); },
+          className: 'icon-btn',
+          style: { color: 'var(--text-secondary)' }
         },
           React.createElement(Trash2, { size: 18 })
         )
@@ -945,24 +963,24 @@
         }
       };
 
-      var handleDragStart = function(index) {
-        setDragInfo({ draggingIndex: index, dragOverIndex: null });
+      var handlePointerDragStart = function(index, pointerId) {
+        setDragInfo({ draggingIndex: index, dragOverIndex: null, pointerId: pointerId });
       };
 
-      var handleDragOver = function(index) {
+      var handlePointerMove = function(index) {
         if (dragInfo.draggingIndex !== null && dragInfo.draggingIndex !== index) {
           setDragInfo(function(prev) { return Object.assign({}, prev, { dragOverIndex: index }); });
         }
       };
 
-      var handleDragEnd = function() {
+      var handlePointerDragEnd = function() {
         if (dragInfo.draggingIndex !== null && dragInfo.dragOverIndex !== null && dragInfo.draggingIndex !== dragInfo.dragOverIndex) {
           var newPlayers = state.players.slice();
           var item = newPlayers.splice(dragInfo.draggingIndex, 1)[0];
           newPlayers.splice(dragInfo.dragOverIndex, 0, item);
           dispatch({ type: 'REORDER_PLAYERS', players: newPlayers });
         }
-        setDragInfo({ draggingIndex: null, dragOverIndex: null });
+        setDragInfo({ draggingIndex: null, dragOverIndex: null, pointerId: null });
       };
 
       var handlePresetClick = function(rounds) {
@@ -1009,16 +1027,17 @@
                 state.players.length === 0 ?
                   React.createElement('div', { className: 'text-center py-8', style: { color: 'var(--text-secondary)' } }, 'Add at least ' + MIN_PLAYERS + ' players to start') :
                   state.players.map(function(player, index) {
-                    return React.createElement(SetupPlayerCard, { 
-                      key: player.id, 
-                      player: player, 
+                    return React.createElement(SetupPlayerCard, {
+                      key: player.id,
+                      player: player,
                       index: index,
                       onRemove: function(id) { dispatch({ type: 'REMOVE_PLAYER', id: id }); },
-                      onDragStart: handleDragStart,
-                      onDragOver: handleDragOver,
-                      onDragEnd: handleDragEnd,
+                      onPointerDragStart: handlePointerDragStart,
+                      onPointerMove: handlePointerMove,
+                      onPointerDragEnd: handlePointerDragEnd,
                       isDragging: dragInfo.draggingIndex === index,
-                      isDragOver: dragInfo.dragOverIndex === index
+                      isDragOver: dragInfo.dragOverIndex === index,
+                      isAnyDragging: dragInfo.draggingIndex !== null
                     });
                   })
               )
