@@ -172,7 +172,7 @@
     .round-result-score.zero { color: #dc2626; }
 
     .auto-dismiss-btn { position: relative; overflow: hidden; }
-    .auto-dismiss-progress { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255,255,255,0.2); transition: width 0.15s linear; pointer-events: none; }
+    .auto-dismiss-progress { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255,255,255,0.2); pointer-events: none; }
     .auto-dismiss-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.25rem; }
 
     .player-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; background: var(--bg-tertiary); transition: all 0.2s; position: relative; border: 2px solid transparent; }
@@ -1144,25 +1144,37 @@
       var sortedPlayers = players.slice().sort(function(a, b) { return (b.roundScore || 0) - (a.roundScore || 0); });
       var topScore = sortedPlayers[0] ? sortedPlayers[0].roundScore : 0;
 
-      var AUTO_DISMISS_SECONDS = 4;
-      var countdownState = useState(AUTO_DISMISS_SECONDS);
-      var countdown = countdownState[0];
-      var setCountdown = countdownState[1];
+      var AUTO_DISMISS_MS = 4000;
+      var progressState = useState(100);
+      var progress = progressState[0];
+      var setProgress = progressState[1];
+      var startTimeRef = useRef(Date.now());
 
       useScrollLock(true);
 
       useEffect(function() {
-        if (countdown <= 0) {
-          onContinue();
-          return;
-        }
-        var timer = setTimeout(function() {
-          setCountdown(countdown - 1);
-        }, 1000);
-        return function() { clearTimeout(timer); };
-      }, [countdown, onContinue]);
+        var animationId;
+        var startTime = startTimeRef.current;
 
-      var progressPercent = (countdown / AUTO_DISMISS_SECONDS) * 100;
+        function animate() {
+          var elapsed = Date.now() - startTime;
+          var remaining = Math.max(0, AUTO_DISMISS_MS - elapsed);
+          var newProgress = (remaining / AUTO_DISMISS_MS) * 100;
+
+          if (remaining <= 0) {
+            onContinue();
+            return;
+          }
+
+          setProgress(newProgress);
+          animationId = requestAnimationFrame(animate);
+        }
+
+        animationId = requestAnimationFrame(animate);
+        return function() { cancelAnimationFrame(animationId); };
+      }, [onContinue]);
+
+      var displaySeconds = Math.ceil((progress / 100) * (AUTO_DISMISS_MS / 1000));
 
       return React.createElement('div', { className: 'modal-backdrop' },
         React.createElement('div', { className: 'modal-content' },
@@ -1193,9 +1205,9 @@
           ),
           React.createElement('div', { className: 'modal-footer' },
             React.createElement('button', { onClick: onContinue, className: 'btn btn-primary w-full auto-dismiss-btn' },
-              React.createElement('span', { className: 'auto-dismiss-progress', style: { width: progressPercent + '%' } }),
+              React.createElement('span', { className: 'auto-dismiss-progress', style: { width: progress + '%' } }),
               React.createElement('span', { className: 'auto-dismiss-content' },
-                'Continue (' + countdown + 's) ', React.createElement(ChevronRight, { size: 20 })
+                'Continue (' + displaySeconds + 's) ', React.createElement(ChevronRight, { size: 20 })
               )
             )
           )
