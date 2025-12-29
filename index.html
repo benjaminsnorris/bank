@@ -918,7 +918,7 @@
     // Player Card for game
     function PlayerCard(props) {
       var player = props.player;
-      var turnOrder = props.turnOrder;
+      var rank = props.rank;
       var isCurrentTurn = props.isCurrentTurn;
       var bankTotal = props.bankTotal;
 
@@ -927,13 +927,13 @@
       var roundGain = hasBanked ? player.roundScore : bankTotal;
       var totalScore = baseScore + roundGain;
 
-      var turnBadgeClass = 'turn-badge' + (isCurrentTurn && !hasBanked ? ' current' : '') + (hasBanked ? ' banked' : '');
+      var rankBadgeClass = 'turn-badge' + (isCurrentTurn && !hasBanked ? ' current' : '') + (hasBanked ? ' banked' : '');
       var cardClass = 'player-card' + (hasBanked ? ' banked' : '') + (isCurrentTurn && !hasBanked ? ' current-turn' : '');
 
       return React.createElement('div', { className: cardClass },
         isCurrentTurn && !hasBanked && React.createElement('div', { className: 'player-card-indicator' }),
-        // Turn order badge
-        React.createElement('div', { className: turnBadgeClass }, turnOrder),
+        // Rank badge (based on cumulative score coming into round)
+        React.createElement('div', { className: rankBadgeClass }, rank),
         // Name and status
         React.createElement('div', { className: 'flex-1 min-w-0' },
           React.createElement('div', { className: 'flex items-center gap-2' },
@@ -1673,28 +1673,38 @@
               )
             )
           ),
-          // Player sidebar - sorted by effective score
+          // Player sidebar - sorted by actual score, with rank badges showing position coming into round
           React.createElement('div', { className: 'game-sidebar card p-4' },
             React.createElement('h2', { className: 'text-lg font-bold mb-3 flex items-center gap-2' }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players'),
             React.createElement('div', { className: 'flex flex-col gap-2' },
-              state.players
-                .map(function(player, index) { return { player: player, originalIndex: index }; })
-                .sort(function(a, b) {
-                  var scoreA = a.player.cumulativeScore + (a.player.hasBanked ? a.player.roundScore : 0);
-                  var scoreB = b.player.cumulativeScore + (b.player.hasBanked ? b.player.roundScore : 0);
-                  return scoreB - scoreA;
-                })
-                .map(function(item) {
-                  var player = item.player;
-                  var originalIndex = item.originalIndex;
-                  return React.createElement(PlayerCard, {
-                    key: player.id,
-                    player: player,
-                    turnOrder: originalIndex + 1,
-                    isCurrentTurn: originalIndex === state.currentPlayerIndex,
-                    bankTotal: state.bankTotal
+              (function() {
+                // Calculate ranks based on cumulative score (position coming into round)
+                var rankMap = {};
+                state.players.slice().sort(function(a, b) {
+                  return b.cumulativeScore - a.cumulativeScore;
+                }).forEach(function(player, index) {
+                  rankMap[player.id] = index + 1;
+                });
+                // Sort by actual score for display, pass pre-calculated rank
+                return state.players
+                  .map(function(player, index) { return { player: player, originalIndex: index }; })
+                  .sort(function(a, b) {
+                    var scoreA = a.player.cumulativeScore + (a.player.hasBanked ? a.player.roundScore : 0);
+                    var scoreB = b.player.cumulativeScore + (b.player.hasBanked ? b.player.roundScore : 0);
+                    return scoreB - scoreA;
+                  })
+                  .map(function(item) {
+                    var player = item.player;
+                    var originalIndex = item.originalIndex;
+                    return React.createElement(PlayerCard, {
+                      key: player.id,
+                      player: player,
+                      rank: rankMap[player.id],
+                      isCurrentTurn: originalIndex === state.currentPlayerIndex,
+                      bankTotal: state.bankTotal
+                    });
                   });
-                })
+              })()
             )
           )
         ),
