@@ -172,7 +172,7 @@
     .round-result-score.zero { color: #dc2626; }
 
     .auto-dismiss-btn { position: relative; overflow: hidden; }
-    .auto-dismiss-progress { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255,255,255,0.2); transition: width 0.15s linear; pointer-events: none; }
+    .auto-dismiss-progress { position: absolute; top: 0; left: 0; height: 100%; background: rgba(255,255,255,0.2); pointer-events: none; }
     .auto-dismiss-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 0.25rem; }
 
     .player-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; background: var(--bg-tertiary); transition: all 0.2s; position: relative; border: 2px solid transparent; }
@@ -189,11 +189,10 @@
 
     /* Score display */
     .score-section { text-align: right; min-width: 4.5rem; }
-    .score-main { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
-    .score-main.potential { color: var(--text-secondary); font-style: italic; }
-    .score-breakdown { font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; }
-    .score-gain { color: var(--text-accent); font-weight: 600; }
-    .score-gain.potential { color: var(--text-secondary); font-weight: 400; }
+    .score-main { font-size: 1.25rem; font-weight: 700; line-height: 1.2; color: var(--text-primary); }
+    .score-secondary { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.3; }
+    .score-secondary.projected { font-style: italic; }
+    .score-secondary.banked { color: var(--text-accent); font-weight: 600; }
     .drag-handle { color: var(--text-secondary); cursor: grab; touch-action: none; padding: 0.25rem; display: flex; align-items: center; user-select: none; -webkit-user-select: none; }
     .drag-handle:active { cursor: grabbing; }
     .player-card.pointer-dragging { opacity: 0.5; }
@@ -332,7 +331,7 @@
       .turn-badge { width: 1.25rem; height: 1.25rem; font-size: 0.625rem; }
       .score-section { min-width: 3.5rem; }
       .score-main { font-size: 1rem; }
-      .score-breakdown { font-size: 0.6rem; }
+      .score-secondary { font-size: 0.8rem; }
     }
 
     /* Extra short landscape (very limited height) */
@@ -385,7 +384,7 @@
       .player-card { padding: 1rem; gap: 1rem; }
       .turn-badge { width: 2rem; height: 2rem; font-size: 0.875rem; }
       .score-main { font-size: 1.5rem; }
-      .score-breakdown { font-size: 0.8rem; }
+      .score-secondary { font-size: 1.1rem; }
     }
 
     /* Extra large screens - even bigger */
@@ -919,7 +918,7 @@
     // Player Card for game
     function PlayerCard(props) {
       var player = props.player;
-      var turnOrder = props.turnOrder;
+      var rank = props.rank;
       var isCurrentTurn = props.isCurrentTurn;
       var bankTotal = props.bankTotal;
 
@@ -928,13 +927,13 @@
       var roundGain = hasBanked ? player.roundScore : bankTotal;
       var totalScore = baseScore + roundGain;
 
-      var turnBadgeClass = 'turn-badge' + (isCurrentTurn && !hasBanked ? ' current' : '') + (hasBanked ? ' banked' : '');
+      var rankBadgeClass = 'turn-badge' + (isCurrentTurn && !hasBanked ? ' current' : '') + (hasBanked ? ' banked' : '');
       var cardClass = 'player-card' + (hasBanked ? ' banked' : '') + (isCurrentTurn && !hasBanked ? ' current-turn' : '');
 
       return React.createElement('div', { className: cardClass },
         isCurrentTurn && !hasBanked && React.createElement('div', { className: 'player-card-indicator' }),
-        // Turn order badge
-        React.createElement('div', { className: turnBadgeClass }, turnOrder),
+        // Rank badge (based on cumulative score coming into round)
+        React.createElement('div', { className: rankBadgeClass }, rank),
         // Name and status
         React.createElement('div', { className: 'flex-1 min-w-0' },
           React.createElement('div', { className: 'flex items-center gap-2' },
@@ -944,14 +943,11 @@
         ),
         // Score section
         React.createElement('div', { className: 'score-section' },
-          React.createElement('div', { className: 'score-main' + (hasBanked ? '' : ' potential') },
-            hasBanked ? totalScore : '~' + totalScore
+          React.createElement('div', { className: 'score-main' },
+            hasBanked ? totalScore : baseScore
           ),
-          React.createElement('div', { className: 'score-breakdown' },
-            baseScore + ' ',
-            React.createElement('span', { className: 'score-gain' + (hasBanked ? '' : ' potential') },
-              '+ ' + roundGain
-            )
+          React.createElement('div', { className: 'score-secondary' + (hasBanked ? ' banked' : ' projected') },
+            hasBanked ? '+' + roundGain : totalScore
           )
         )
       );
@@ -1148,25 +1144,37 @@
       var sortedPlayers = players.slice().sort(function(a, b) { return (b.roundScore || 0) - (a.roundScore || 0); });
       var topScore = sortedPlayers[0] ? sortedPlayers[0].roundScore : 0;
 
-      var AUTO_DISMISS_SECONDS = 4;
-      var countdownState = useState(AUTO_DISMISS_SECONDS);
-      var countdown = countdownState[0];
-      var setCountdown = countdownState[1];
+      var AUTO_DISMISS_MS = 4000;
+      var progressState = useState(100);
+      var progress = progressState[0];
+      var setProgress = progressState[1];
+      var startTimeRef = useRef(Date.now());
 
       useScrollLock(true);
 
       useEffect(function() {
-        if (countdown <= 0) {
-          onContinue();
-          return;
-        }
-        var timer = setTimeout(function() {
-          setCountdown(countdown - 1);
-        }, 1000);
-        return function() { clearTimeout(timer); };
-      }, [countdown, onContinue]);
+        var animationId;
+        var startTime = startTimeRef.current;
 
-      var progressPercent = (countdown / AUTO_DISMISS_SECONDS) * 100;
+        function animate() {
+          var elapsed = Date.now() - startTime;
+          var remaining = Math.max(0, AUTO_DISMISS_MS - elapsed);
+          var newProgress = (remaining / AUTO_DISMISS_MS) * 100;
+
+          if (remaining <= 0) {
+            onContinue();
+            return;
+          }
+
+          setProgress(newProgress);
+          animationId = requestAnimationFrame(animate);
+        }
+
+        animationId = requestAnimationFrame(animate);
+        return function() { cancelAnimationFrame(animationId); };
+      }, [onContinue]);
+
+      var displaySeconds = Math.ceil((progress / 100) * (AUTO_DISMISS_MS / 1000));
 
       return React.createElement('div', { className: 'modal-backdrop' },
         React.createElement('div', { className: 'modal-content' },
@@ -1197,9 +1205,9 @@
           ),
           React.createElement('div', { className: 'modal-footer' },
             React.createElement('button', { onClick: onContinue, className: 'btn btn-primary w-full auto-dismiss-btn' },
-              React.createElement('span', { className: 'auto-dismiss-progress', style: { width: progressPercent + '%' } }),
+              React.createElement('span', { className: 'auto-dismiss-progress', style: { width: progress + '%' } }),
               React.createElement('span', { className: 'auto-dismiss-content' },
-                'Continue (' + countdown + 's) ', React.createElement(ChevronRight, { size: 20 })
+                'Continue (' + displaySeconds + 's) ', React.createElement(ChevronRight, { size: 20 })
               )
             )
           )
@@ -1677,28 +1685,38 @@
               )
             )
           ),
-          // Player sidebar - sorted by effective score
+          // Player sidebar - sorted by actual score, with rank badges showing position coming into round
           React.createElement('div', { className: 'game-sidebar card p-4' },
             React.createElement('h2', { className: 'text-lg font-bold mb-3 flex items-center gap-2' }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players'),
             React.createElement('div', { className: 'flex flex-col gap-2' },
-              state.players
-                .map(function(player, index) { return { player: player, originalIndex: index }; })
-                .sort(function(a, b) {
-                  var scoreA = a.player.cumulativeScore + (a.player.hasBanked ? a.player.roundScore : state.bankTotal);
-                  var scoreB = b.player.cumulativeScore + (b.player.hasBanked ? b.player.roundScore : state.bankTotal);
-                  return scoreB - scoreA;
-                })
-                .map(function(item) {
-                  var player = item.player;
-                  var originalIndex = item.originalIndex;
-                  return React.createElement(PlayerCard, {
-                    key: player.id,
-                    player: player,
-                    turnOrder: originalIndex + 1,
-                    isCurrentTurn: originalIndex === state.currentPlayerIndex,
-                    bankTotal: state.bankTotal
+              (function() {
+                // Calculate ranks based on cumulative score (position coming into round)
+                var rankMap = {};
+                state.players.slice().sort(function(a, b) {
+                  return b.cumulativeScore - a.cumulativeScore;
+                }).forEach(function(player, index) {
+                  rankMap[player.id] = index + 1;
+                });
+                // Sort by actual score for display, pass pre-calculated rank
+                return state.players
+                  .map(function(player, index) { return { player: player, originalIndex: index }; })
+                  .sort(function(a, b) {
+                    var scoreA = a.player.cumulativeScore + (a.player.hasBanked ? a.player.roundScore : 0);
+                    var scoreB = b.player.cumulativeScore + (b.player.hasBanked ? b.player.roundScore : 0);
+                    return scoreB - scoreA;
+                  })
+                  .map(function(item) {
+                    var player = item.player;
+                    var originalIndex = item.originalIndex;
+                    return React.createElement(PlayerCard, {
+                      key: player.id,
+                      player: player,
+                      rank: rankMap[player.id],
+                      isCurrentTurn: originalIndex === state.currentPlayerIndex,
+                      bankTotal: state.bankTotal
+                    });
                   });
-                })
+              })()
             )
           )
         ),
