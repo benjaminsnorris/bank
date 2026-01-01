@@ -268,15 +268,21 @@
     .shareable-footer { display: flex; align-items: center; justify-content: center; gap: 0.25rem; padding-top: 1rem; font-size: 0.875rem; color: var(--text-secondary); }
 
     /* Game layout */
-    .game-layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 1rem; gap: 1rem; }
+    .game-layout { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 1rem; gap: 1rem; }
     .game-main { display: flex; flex-direction: column; gap: 0.75rem; flex-shrink: 0; }
     .game-controls { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; flex-shrink: 0; }
-    .game-sidebar { flex: 1; min-height: 0; overflow-y: auto; }
-    
+    .game-sidebar { flex-shrink: 0; }
+
     @media (min-width: 768px) {
-      .game-layout { flex-direction: row !important; }
-      .game-main { flex: 1; flex-shrink: 1; }
-      .game-sidebar { width: 280px; flex-shrink: 0; flex: none; }
+      .game-layout {
+        display: grid !important;
+        grid-template-columns: 1fr 280px;
+        grid-template-rows: 1fr auto;
+        overflow: hidden;
+      }
+      .game-main { grid-column: 1; grid-row: 1; overflow-y: auto; min-height: 0; }
+      .game-sidebar { grid-column: 2; grid-row: 1 / -1; width: 280px; overflow-y: auto; min-height: 0; }
+      .app-footer { grid-column: 1; grid-row: 2; }
     }
 
     /* Landscape mobile - two column layout with both scrollable */
@@ -287,22 +293,27 @@
       .brand-icon { width: 24px; height: 24px; }
 
       .game-layout {
-        flex-direction: row !important;
+        display: grid !important;
+        grid-template-columns: 1fr 200px;
+        grid-template-rows: 1fr auto;
         padding: 0.5rem;
         gap: 0.5rem;
+        overflow: hidden;
       }
       .game-main {
-        flex: 1;
-        flex-shrink: 1;
+        grid-column: 1;
+        grid-row: 1;
         overflow-y: auto;
         min-height: 0;
       }
       .game-sidebar {
+        grid-column: 2;
+        grid-row: 1 / -1;
         width: 200px;
-        flex-shrink: 0;
-        flex: none;
         overflow-y: auto;
+        min-height: 0;
       }
+      .app-footer { grid-column: 1; grid-row: 2; }
       .game-sidebar.card { padding: 0.5rem; }
       .game-sidebar h2 { font-size: 0.875rem; margin-bottom: 0.375rem; }
 
@@ -377,6 +388,7 @@
       .turn-indicator { font-size: 1.5rem; }
 
       /* Larger player cards */
+      .game-layout { grid-template-columns: 1fr 320px; }
       .game-sidebar { width: 320px; }
       .game-sidebar.card { padding: 1.25rem; }
       .game-sidebar h2 { font-size: 1.25rem; }
@@ -406,20 +418,16 @@
 
       .bank-btn { max-width: 36rem; padding: 1.75rem 2.5rem; font-size: 1.5rem; }
 
+      .game-layout { grid-template-columns: 1fr 360px; }
       .game-sidebar { width: 360px; }
     }
 
-    /* Footer - positioned inside game-main */
-    .app-footer { padding: 0.75rem 0 0; display: flex; justify-content: center; }
+    /* Footer */
+    .app-footer { padding: 0.75rem 0; display: flex; justify-content: center; }
     .footer-link { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.625rem; border-radius: 0.375rem; background: transparent; border: none; color: var(--text-secondary); font-size: 0.75rem; font-family: inherit; cursor: pointer; transition: all 0.2s; text-decoration: none; opacity: 0.7; }
     .footer-link:hover { background: rgba(0,0,0,0.05); opacity: 1; }
     .dark .footer-link:hover { background: rgba(255,255,255,0.05); }
     .footer-logo { width: 16px; height: 16px; border-radius: 3px; object-fit: contain; }
-
-    /* On desktop, push footer to bottom of game-main */
-    @media (min-width: 768px) {
-      .app-footer { margin-top: auto; padding-bottom: 0.5rem; }
-    }
 
     /* Hide Players heading on small mobile screens */
     @media (max-width: 600px) and (max-height: 750px) {
@@ -1792,8 +1800,7 @@
                   React.createElement('span', null, 'BANK ' + state.bankTotal)
                 )
               )
-            ),
-            React.createElement(AppFooter)
+            )
           ),
           // Player sidebar - sorted by actual score, with rank badges showing position coming into round
           React.createElement('div', { className: 'game-sidebar card p-4' },
@@ -1828,7 +1835,9 @@
                   });
               })()
             )
-          )
+          ),
+          // Footer - appears after player list on mobile, at bottom of main column on desktop
+          React.createElement(AppFooter)
         ),
         showBankModal && React.createElement(BankingModal, { players: state.players, bankTotal: state.bankTotal, onConfirm: handleBank, onClose: function() { setShowBankModal(false); } }),
         showRestartConfirm && React.createElement('div', { className: 'modal-backdrop', onClick: function() { setShowRestartConfirm(false); } },
