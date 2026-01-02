@@ -80,7 +80,9 @@
     .header-left { display: flex; align-items: center; gap: 1rem; }
     .header-brand { display: flex; align-items: center; gap: 0.5rem; }
     .header-title { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; letter-spacing: 0.05em; }
-    .header-round { font-size: 1.125rem; font-weight: 600; opacity: 0.95; background: rgba(255,255,255,0.15); padding: 0.25rem 0.75rem; border-radius: 0.5rem; }
+    .header-round { font-size: 1.125rem; font-weight: 600; opacity: 0.95; background: rgba(255,255,255,0.15); padding: 0.25rem 0.75rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+    .header-round.final { background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%); color: white; animation: pulse-glow 2s ease-in-out infinite; font-weight: 700; letter-spacing: 0.05em; }
+    @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 8px rgba(220, 38, 38, 0.4); } 50% { box-shadow: 0 0 16px rgba(220, 38, 38, 0.7); } }
     .header-right { display: flex; align-items: center; gap: 0.5rem; }
     
     .brand-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; }
@@ -1731,7 +1733,12 @@
                 React.createElement('div', { className: 'brand-icon' }, React.createElement(BankIcon, { size: 22 })),
                 React.createElement('h1', { className: 'header-title' }, 'BANK')
               ),
-              React.createElement('div', { className: 'header-round' }, 'Round ' + state.currentRound + '/' + state.roundConfig)
+              (function() {
+                var isFinalRound = state.currentRound === state.roundConfig && state.phase !== 'setup' && state.phase !== 'gameOver';
+                return React.createElement('div', { className: 'header-round' + (isFinalRound ? ' final' : '') },
+                  isFinalRound ? 'FINAL ROUND' : 'Round ' + state.currentRound + '/' + state.roundConfig
+                );
+              })()
             ),
             React.createElement('div', { className: 'header-right settings-popover-wrapper' },
               React.createElement('button', { onClick: function() { setShowSettings(!showSettings); }, className: 'icon-btn', title: 'Settings' }, React.createElement(Settings, { size: 18 })),
