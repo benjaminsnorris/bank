@@ -1552,6 +1552,7 @@
         if (stats.biggestBankPlayer) lines.push('Biggest Bank: ' + stats.biggestBank + ' (' + stats.biggestBankPlayer + ')');
         if (conservativePlayer) lines.push('🛡️ The Safe Player: ' + conservativePlayer.name);
         if (riskyPlayer) lines.push('🎲 The Daredevil: ' + riskyPlayer.name);
+        lines.push('', 'Play Bank: https://bennorris.com/bank');
         var text = lines.join('\n');
 
         // Try to share with image first
@@ -1687,7 +1688,7 @@
               React.createElement('div', { className: 'shareable-footer' },
                 React.createElement('span', null, today),
                 React.createElement('span', null, ' • '),
-                React.createElement('span', { style: { fontWeight: 600 } }, 'Bank Dice Game')
+                React.createElement('span', { style: { fontWeight: 600 } }, 'bennorris.com/bank')
               )
             ),
             // Action buttons (outside shareable area)
