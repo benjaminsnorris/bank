@@ -461,6 +461,42 @@
     .dark .rule-badge-danger { background: rgba(248,113,113,0.2); color: #f87171; }
     .rule-badge-double { background: rgba(217,119,6,0.2); color: #d97706; }
     .dark .rule-badge-double { background: rgba(251,191,36,0.2); color: #fbbf24; }
+
+    /* Fullscreen Instructions Modal */
+    .fullscreen-modal-backdrop { position: fixed; inset: 0; background: var(--bg-primary); z-index: 200; display: flex; flex-direction: column; overflow: hidden; }
+    .fullscreen-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: var(--header-bg); color: white; flex-shrink: 0; }
+    .fullscreen-modal-title { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.75rem; }
+    .fullscreen-modal-close { background: rgba(255,255,255,0.15); border: none; color: white; padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .fullscreen-modal-close:hover { background: rgba(255,255,255,0.25); }
+    .fullscreen-modal-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 1.5rem; }
+    .fullscreen-modal-content { flex: 1; display: flex; gap: 1.5rem; min-height: 0; }
+    .fullscreen-modal-content.single-column { flex-direction: column; overflow-y: auto; }
+    .fullscreen-modal-content.three-columns { flex-direction: row; }
+    .fullscreen-modal-zone { flex: 1; border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column; min-height: 0; }
+    .fullscreen-modal-content.three-columns .fullscreen-modal-zone { overflow-y: auto; }
+    .fullscreen-modal-content.single-column .fullscreen-modal-zone { flex: none; }
+    .fullscreen-modal-zone-safe { background: var(--bg-safe); }
+    .fullscreen-modal-zone-danger { background: var(--bg-danger); }
+    .fullscreen-modal-zone-bank { background: linear-gradient(135deg, rgba(5,150,105,0.15) 0%, rgba(13,148,136,0.15) 100%); border: 3px solid var(--text-accent); }
+    .fullscreen-modal-zone-title { font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .fullscreen-modal-zone-safe .fullscreen-modal-zone-title { color: #059669; }
+    .dark .fullscreen-modal-zone-safe .fullscreen-modal-zone-title { color: #34d399; }
+    .fullscreen-modal-zone-danger .fullscreen-modal-zone-title { color: #dc2626; }
+    .dark .fullscreen-modal-zone-danger .fullscreen-modal-zone-title { color: #f87171; }
+    .fullscreen-modal-zone-bank .fullscreen-modal-zone-title { color: var(--text-accent); }
+    .fullscreen-modal-item { display: flex; align-items: center; gap: 0.75rem; color: var(--text-primary); padding: 0.375rem 0; }
+    .fullscreen-modal-badge { display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-weight: 700; flex-shrink: 0; }
+    .fullscreen-modal-badge-safe { background: rgba(5,150,105,0.2); color: #059669; }
+    .dark .fullscreen-modal-badge-safe { background: rgba(52,211,153,0.2); color: #34d399; }
+    .fullscreen-modal-badge-danger { background: rgba(220,38,38,0.2); color: #dc2626; }
+    .dark .fullscreen-modal-badge-danger { background: rgba(248,113,113,0.2); color: #f87171; }
+    .fullscreen-modal-badge-double { background: rgba(217,119,6,0.2); color: #d97706; }
+    .dark .fullscreen-modal-badge-double { background: rgba(251,191,36,0.2); color: #fbbf24; }
+
+    /* New to Bank button */
+    .new-to-bank-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; transition: all 0.2s; white-space: nowrap; }
+    .new-to-bank-btn:hover { border-color: var(--text-accent); color: var(--text-accent); background: rgba(5,150,105,0.05); }
+    .new-to-bank-btn svg { flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -1012,6 +1048,7 @@
       var state = props.state;
       var dispatch = props.dispatch;
       var onRestart = props.onRestart;
+      var onShowInstructions = props.onShowInstructions;
 
       if (!isOpen) return null;
 
@@ -1089,6 +1126,14 @@
               }, '+')
             )
           ),
+          // How to Play button
+          React.createElement('button', {
+            className: 'settings-item-btn',
+            onClick: function() { onClose(); onShowInstructions(); }
+          },
+            React.createElement(HelpCircle, { size: 16 }),
+            'How to Play'
+          ),
           // Restart button
           React.createElement('button', {
             className: 'settings-item-btn danger',
@@ -1111,6 +1156,130 @@
               className: 'footer-logo'
             }),
             'App by Ben Norris'
+          )
+        )
+      );
+    }
+
+    // Fullscreen Instructions Modal
+    function FullscreenInstructionsModal(props) {
+      var onClose = props.onClose;
+      var containerRef = useRef(null);
+      var sizeState = useState({ fontSize: 16, iconSize: 20, badgeFontSize: 14, isThreeColumn: true });
+      var sizes = sizeState[0];
+      var setSizes = sizeState[1];
+
+      useScrollLock(true);
+
+      useEffect(function() {
+        var calculateSizes = function() {
+          if (!containerRef.current) return;
+
+          var container = containerRef.current;
+          var rect = container.getBoundingClientRect();
+          var width = rect.width;
+          var height = rect.height;
+
+          // Determine layout mode
+          var isThreeColumn = width >= 900;
+
+          // Calculate optimal font size to fill the space
+          // In 3-column mode: each column has ~1/3 width, content needs to fit vertically
+          // In single-column mode: full width, content stacks vertically with scroll
+
+          var baseFontSize;
+          if (isThreeColumn) {
+            // For 3 columns, optimize for the available height
+            // Each zone has: title + 2-3 items
+            // Estimate: need about 8 lines of content per column
+            var availableHeight = height - 48; // minus padding
+            baseFontSize = Math.min(
+              Math.floor(availableHeight / 10), // vertical constraint
+              Math.floor(width / 45), // horizontal constraint per column
+              48 // max font size
+            );
+          } else {
+            // For single column, we have scroll, so optimize for width
+            baseFontSize = Math.min(
+              Math.floor(width / 25),
+              Math.floor(height / 20),
+              36
+            );
+          }
+
+          baseFontSize = Math.max(baseFontSize, 14); // minimum font size
+
+          setSizes({
+            fontSize: baseFontSize,
+            iconSize: Math.max(Math.floor(baseFontSize * 1.2), 16),
+            badgeFontSize: Math.max(Math.floor(baseFontSize * 0.85), 12),
+            isThreeColumn: isThreeColumn
+          });
+        };
+
+        calculateSizes();
+        window.addEventListener('resize', calculateSizes);
+        return function() { window.removeEventListener('resize', calculateSizes); };
+      }, []);
+
+      var titleStyle = { fontSize: sizes.fontSize * 1.1 + 'px' };
+      var itemStyle = { fontSize: sizes.fontSize + 'px' };
+      var badgeStyle = { fontSize: sizes.badgeFontSize + 'px', padding: (sizes.badgeFontSize * 0.2) + 'px ' + (sizes.badgeFontSize * 0.6) + 'px' };
+
+      return React.createElement('div', { className: 'fullscreen-modal-backdrop' },
+        React.createElement('div', { className: 'fullscreen-modal-header' },
+          React.createElement('div', { className: 'fullscreen-modal-title' },
+            React.createElement(HelpCircle, { size: 24 }),
+            'How to Play Bank'
+          ),
+          React.createElement('button', { className: 'fullscreen-modal-close', onClick: onClose, title: 'Close' },
+            React.createElement(X, { size: 24 })
+          )
+        ),
+        React.createElement('div', { className: 'fullscreen-modal-body', ref: containerRef },
+          React.createElement('div', { className: 'fullscreen-modal-content ' + (sizes.isThreeColumn ? 'three-columns' : 'single-column') },
+            // Safe Zone
+            React.createElement('div', { className: 'fullscreen-modal-zone fullscreen-modal-zone-safe' },
+              React.createElement('div', { className: 'fullscreen-modal-zone-title', style: titleStyle },
+                React.createElement(Shield, { size: sizes.iconSize }),
+                'Safe Zone (First 3 Rolls)'
+              ),
+              React.createElement('div', { className: 'fullscreen-modal-item', style: itemStyle },
+                React.createElement('span', { className: 'fullscreen-modal-badge fullscreen-modal-badge-safe', style: badgeStyle }, '7'),
+                'Lucky! Get +70 bonus points'
+              ),
+              React.createElement('div', { className: 'fullscreen-modal-item', style: itemStyle },
+                'Other rolls add to the bank'
+              )
+            ),
+            // Danger Zone
+            React.createElement('div', { className: 'fullscreen-modal-zone fullscreen-modal-zone-danger' },
+              React.createElement('div', { className: 'fullscreen-modal-zone-title', style: titleStyle },
+                React.createElement(AlertTriangle, { size: sizes.iconSize }),
+                'Danger Zone (4+ Rolls)'
+              ),
+              React.createElement('div', { className: 'fullscreen-modal-item', style: itemStyle },
+                React.createElement('span', { className: 'fullscreen-modal-badge fullscreen-modal-badge-danger', style: badgeStyle }, '7'),
+                'BUST! Lose everything this round'
+              ),
+              React.createElement('div', { className: 'fullscreen-modal-item', style: itemStyle },
+                React.createElement('span', { className: 'fullscreen-modal-badge fullscreen-modal-badge-double', style: badgeStyle }, 'Doubles'),
+                'Double the bank total!'
+              )
+            ),
+            // Bank It
+            React.createElement('div', { className: 'fullscreen-modal-zone fullscreen-modal-zone-bank' },
+              React.createElement('div', { className: 'fullscreen-modal-zone-title', style: titleStyle },
+                React.createElement(BankIcon, { size: sizes.iconSize }),
+                'Bank It!'
+              ),
+              React.createElement('div', { className: 'fullscreen-modal-item', style: itemStyle },
+                'Tap BANK anytime to lock in your points'
+              ),
+              React.createElement('div', { className: 'fullscreen-modal-item', style: itemStyle },
+                'Highest score after all rounds wins!'
+              )
+            )
           )
         )
       );
@@ -1693,6 +1862,9 @@
       var settingsState = useState(false);
       var showSettings = settingsState[0];
       var setShowSettings = settingsState[1];
+      var instructionsState = useState(false);
+      var showInstructions = instructionsState[0];
+      var setShowInstructions = instructionsState[1];
       var wideScreenState = useState(window.innerWidth >= 768);
       var isWideScreen = wideScreenState[0];
       var setIsWideScreen = wideScreenState[1];
@@ -1747,7 +1919,8 @@
                 onClose: function() { setShowSettings(false); },
                 state: state,
                 dispatch: dispatch,
-                onRestart: function() { setShowRestartConfirm(true); }
+                onRestart: function() { setShowRestartConfirm(true); },
+                onShowInstructions: function() { setShowInstructions(true); }
               }
               )
             )
@@ -1804,7 +1977,17 @@
           ),
           // Player sidebar - sorted by actual score, with rank badges showing position coming into round
           React.createElement('div', { className: 'game-sidebar card p-4' },
-            React.createElement('h2', { className: 'text-lg font-bold mb-3 flex items-center gap-2' }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players'),
+            React.createElement('div', { className: 'flex items-center justify-between mb-3' },
+              React.createElement('h2', { className: 'text-lg font-bold flex items-center gap-2', style: { marginBottom: 0 } }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players'),
+              React.createElement('button', {
+                className: 'new-to-bank-btn',
+                onClick: function() { setShowInstructions(true); },
+                title: 'How to play Bank'
+              },
+                React.createElement(HelpCircle, { size: 14 }),
+                isWideScreen ? 'New to Bank?' : 'New'
+              )
+            ),
             React.createElement('div', { className: 'flex flex-col gap-2' },
               (function() {
                 // Calculate ranks based on cumulative score (position coming into round)
@@ -1850,7 +2033,8 @@
               )
             )
           )
-        )
+        ),
+        showInstructions && React.createElement(FullscreenInstructionsModal, { onClose: function() { setShowInstructions(false); } })
       );
     }// Main App
     function BankApp() {
