@@ -255,6 +255,8 @@
     .stat-card { text-align: center; padding: 1rem; border-radius: 0.75rem; background: var(--bg-tertiary); }
     .stat-value { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; }
     .stat-label { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+    .award-card { position: relative; padding-top: 1.5rem; }
+    .award-emoji { font-size: 1.5rem; margin-bottom: 0.25rem; }
     .winner-circle { width: 6rem; height: 6rem; border-radius: 50%; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); margin: 0 auto 1rem; }
     .podium-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1rem; border-radius: 0.75rem; background: var(--bg-tertiary); margin-bottom: 0.5rem; }
     .podium-item:last-child { margin-bottom: 0; }
@@ -608,7 +610,7 @@
         case 'ADD_PLAYER':
           if (state.players.length >= MAX_PLAYERS) return state;
           return Object.assign({}, state, {
-            players: state.players.concat([{ id: Date.now(), name: action.name, cumulativeScore: 0, roundScore: null, hasBanked: false }])
+            players: state.players.concat([{ id: Date.now(), name: action.name, cumulativeScore: 0, roundScore: null, hasBanked: false, doublesRolled: 0, sevensRolled: 0, bankRolls: [] }])
           });
         case 'REMOVE_PLAYER':
           return Object.assign({}, state, { players: state.players.filter(function(p) { return p.id !== action.id; }) });
@@ -626,7 +628,7 @@
           return Object.assign({}, state, {
             phase: 'playing', currentRound: 1, rollCount: 0, bankTotal: 0, currentPlayerIndex: 0,
             lastRoll: null, lastRollEffect: null, history: [],
-            players: state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: 0, roundScore: null, hasBanked: false }); }),
+            players: state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: 0, roundScore: null, hasBanked: false, doublesRolled: 0, sevensRolled: 0, bankRolls: [] }); }),
             stats: { totalSevens: 0, totalDoubles: 0, biggestBank: 0, biggestBankPlayer: null }
           });
         case 'ROLL': {
@@ -639,6 +641,18 @@
           var rollEffect = null;
           var newPhase = state.phase;
           var newStats = Object.assign({}, state.stats);
+          var currentPlayerId = state.players[state.currentPlayerIndex].id;
+
+          // Update per-player stats for doubles/sevens
+          var newPlayers = state.players.map(function(p) {
+            if (p.id === currentPlayerId) {
+              var updates = {};
+              if (isSeven) updates.sevensRolled = (p.sevensRolled || 0) + 1;
+              if (isDoubles) updates.doublesRolled = (p.doublesRolled || 0) + 1;
+              if (Object.keys(updates).length > 0) return Object.assign({}, p, updates);
+            }
+            return p;
+          });
 
           if (isSeven) {
             newStats.totalSevens++;
@@ -651,18 +665,18 @@
           } else { newBankTotal += sum; rollEffect = '+' + sum; }
 
           var nextPlayerIndex = state.currentPlayerIndex;
-          var activePlayers = state.players.filter(function(p) { return !p.hasBanked; });
+          var activePlayers = newPlayers.filter(function(p) { return !p.hasBanked; });
           if (activePlayers.length > 0 && newPhase !== 'roundEnd') {
-            var currPlayer = state.players[state.currentPlayerIndex];
+            var currPlayer = newPlayers[state.currentPlayerIndex];
             var currentActiveIndex = activePlayers.findIndex(function(p) { return p.id === (currPlayer ? currPlayer.id : null); });
             var nextActiveIndex = (currentActiveIndex + 1) % activePlayers.length;
-            nextPlayerIndex = state.players.findIndex(function(p) { return p.id === activePlayers[nextActiveIndex].id; });
+            nextPlayerIndex = newPlayers.findIndex(function(p) { return p.id === activePlayers[nextActiveIndex].id; });
           }
 
           return Object.assign({}, state, {
-            rollCount: newRollCount, bankTotal: newBankTotal, lastRoll: { die1: action.die1, die2: action.die2 },
+            players: newPlayers, rollCount: newRollCount, bankTotal: newBankTotal, lastRoll: { die1: action.die1, die2: action.die2 },
             lastRollEffect: rollEffect, currentPlayerIndex: nextPlayerIndex, phase: newPhase, stats: newStats,
-            history: state.history.concat([{ type: 'roll', prevState: { bankTotal: state.bankTotal, rollCount: state.rollCount, currentPlayerIndex: state.currentPlayerIndex, stats: state.stats } }])
+            history: state.history.concat([{ type: 'roll', prevState: { bankTotal: state.bankTotal, rollCount: state.rollCount, currentPlayerIndex: state.currentPlayerIndex, stats: state.stats }, prevPlayers: state.players }])
           });
         }
         case 'KEYPAD_INPUT': {
@@ -672,6 +686,18 @@
           var rollEffect = null;
           var newPhase = state.phase;
           var newStats = Object.assign({}, state.stats);
+          var currentPlayerId = state.players[state.currentPlayerIndex].id;
+
+          // Update per-player stats for doubles/sevens
+          var newPlayers = state.players.map(function(p) {
+            if (p.id === currentPlayerId) {
+              var updates = {};
+              if (action.isSeven) updates.sevensRolled = (p.sevensRolled || 0) + 1;
+              if (action.isDoubles) updates.doublesRolled = (p.doublesRolled || 0) + 1;
+              if (Object.keys(updates).length > 0) return Object.assign({}, p, updates);
+            }
+            return p;
+          });
 
           if (action.isSeven) {
             newStats.totalSevens++;
@@ -683,18 +709,18 @@
           } else { newBankTotal += action.sum; rollEffect = '+' + action.sum; }
 
           var nextPlayerIndex = state.currentPlayerIndex;
-          var activePlayers = state.players.filter(function(p) { return !p.hasBanked; });
+          var activePlayers = newPlayers.filter(function(p) { return !p.hasBanked; });
           if (activePlayers.length > 0 && newPhase !== 'roundEnd') {
-            var currPlayer = state.players[state.currentPlayerIndex];
+            var currPlayer = newPlayers[state.currentPlayerIndex];
             var currentActiveIndex = activePlayers.findIndex(function(p) { return p.id === (currPlayer ? currPlayer.id : null); });
             var nextActiveIndex = (currentActiveIndex + 1) % activePlayers.length;
-            nextPlayerIndex = state.players.findIndex(function(p) { return p.id === activePlayers[nextActiveIndex].id; });
+            nextPlayerIndex = newPlayers.findIndex(function(p) { return p.id === activePlayers[nextActiveIndex].id; });
           }
 
           return Object.assign({}, state, {
-            rollCount: newRollCount, bankTotal: newBankTotal, lastRoll: null, lastRollEffect: rollEffect,
+            players: newPlayers, rollCount: newRollCount, bankTotal: newBankTotal, lastRoll: null, lastRollEffect: rollEffect,
             currentPlayerIndex: nextPlayerIndex, phase: newPhase, stats: newStats,
-            history: state.history.concat([{ type: 'roll', prevState: { bankTotal: state.bankTotal, rollCount: state.rollCount, currentPlayerIndex: state.currentPlayerIndex, stats: state.stats } }])
+            history: state.history.concat([{ type: 'roll', prevState: { bankTotal: state.bankTotal, rollCount: state.rollCount, currentPlayerIndex: state.currentPlayerIndex, stats: state.stats }, prevPlayers: state.players }])
           });
         }
         case 'BANK_PLAYERS': {
@@ -702,7 +728,9 @@
           var newPlayers = state.players.map(function(p) {
             if (action.playerIds.indexOf(p.id) !== -1 && !p.hasBanked) {
               if (state.bankTotal > newStats.biggestBank) { newStats.biggestBank = state.bankTotal; newStats.biggestBankPlayer = p.name; }
-              return Object.assign({}, p, { roundScore: state.bankTotal, hasBanked: true });
+              // Track which roll they banked on for conservative/risky calculation
+              var updatedBankRolls = (p.bankRolls || []).concat([state.rollCount]);
+              return Object.assign({}, p, { roundScore: state.bankTotal, hasBanked: true, bankRolls: updatedBankRolls });
             }
             return p;
           });
@@ -732,12 +760,12 @@
           if (state.history.length === 0) return state;
           var lastEntry = state.history[state.history.length - 1];
           var newHistory = state.history.slice(0, -1);
-          if (lastEntry.type === 'roll') return Object.assign({}, state, { bankTotal: lastEntry.prevState.bankTotal, rollCount: lastEntry.prevState.rollCount, currentPlayerIndex: lastEntry.prevState.currentPlayerIndex, stats: lastEntry.prevState.stats, lastRoll: null, lastRollEffect: null, phase: 'playing', history: newHistory });
+          if (lastEntry.type === 'roll') return Object.assign({}, state, { players: lastEntry.prevPlayers || state.players, bankTotal: lastEntry.prevState.bankTotal, rollCount: lastEntry.prevState.rollCount, currentPlayerIndex: lastEntry.prevState.currentPlayerIndex, stats: lastEntry.prevState.stats, lastRoll: null, lastRollEffect: null, phase: 'playing', history: newHistory });
           if (lastEntry.type === 'bank') return Object.assign({}, state, { players: lastEntry.prevPlayers, stats: lastEntry.prevStats, phase: 'playing', history: newHistory });
           return state;
         case 'NEW_GAME_SAME_PLAYERS':
           return Object.assign({}, state, { phase: 'playing', currentRound: 1, rollCount: 0, bankTotal: 0, currentPlayerIndex: 0, lastRoll: null, lastRollEffect: null, history: [],
-            players: state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: 0, roundScore: null, hasBanked: false }); }),
+            players: state.players.map(function(p) { return Object.assign({}, p, { cumulativeScore: 0, roundScore: null, hasBanked: false, doublesRolled: 0, sevensRolled: 0, bankRolls: [] }); }),
             stats: { totalSevens: 0, totalDoubles: 0, biggestBank: 0, biggestBankPlayer: null }
           });
         case 'GO_TO_SETUP':
@@ -1425,6 +1453,43 @@
       var winner = sortedPlayers[0];
       var today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+      // Calculate player awards
+      var mostDoublesPlayer = players.reduce(function(best, p) {
+        var count = p.doublesRolled || 0;
+        if (!best || count > best.count) return { name: p.name, count: count };
+        return best;
+      }, null);
+
+      var mostSevensPlayer = players.reduce(function(best, p) {
+        var count = p.sevensRolled || 0;
+        if (!best || count > best.count) return { name: p.name, count: count };
+        return best;
+      }, null);
+
+      // Calculate conservative (lowest avg bank roll) and risky (highest avg bank roll)
+      var playersWithBanks = players.filter(function(p) { return p.bankRolls && p.bankRolls.length > 0; });
+      var conservativePlayer = null;
+      var riskyPlayer = null;
+      if (playersWithBanks.length > 0) {
+        var playerAvgs = playersWithBanks.map(function(p) {
+          var sum = p.bankRolls.reduce(function(a, b) { return a + b; }, 0);
+          return { name: p.name, avg: sum / p.bankRolls.length };
+        });
+        conservativePlayer = playerAvgs.reduce(function(best, p) {
+          if (!best || p.avg < best.avg) return p;
+          return best;
+        }, null);
+        riskyPlayer = playerAvgs.reduce(function(best, p) {
+          if (!best || p.avg > best.avg) return p;
+          return best;
+        }, null);
+        // Don't show if they're the same person
+        if (conservativePlayer && riskyPlayer && conservativePlayer.name === riskyPlayer.name) {
+          conservativePlayer = null;
+          riskyPlayer = null;
+        }
+      }
+
       var shareableRef = useRef(null);
       var shareStatusState = useState(null);
       var shareStatus = shareStatusState[0];
@@ -1482,7 +1547,12 @@
           lines.push(prefix + ' ' + p.name + ': ' + p.cumulativeScore);
         });
         lines.push('', '📊 STATS', 'Total Sevens: ' + stats.totalSevens, 'Total Doubles: ' + stats.totalDoubles);
+        if (mostSevensPlayer && mostSevensPlayer.count > 0) lines.push('Lucky 7 Magnet: ' + mostSevensPlayer.name + ' (' + mostSevensPlayer.count + ')');
+        if (mostDoublesPlayer && mostDoublesPlayer.count > 0) lines.push('Double Trouble: ' + mostDoublesPlayer.name + ' (' + mostDoublesPlayer.count + ')');
         if (stats.biggestBankPlayer) lines.push('Biggest Bank: ' + stats.biggestBank + ' (' + stats.biggestBankPlayer + ')');
+        if (conservativePlayer) lines.push('🛡️ The Safe Player: ' + conservativePlayer.name);
+        if (riskyPlayer) lines.push('🔥 The Daredevil: ' + riskyPlayer.name);
+        lines.push('', 'Play Bank: https://bennorris.com/bank');
         var text = lines.join('\n');
 
         // Try to share with image first
@@ -1589,16 +1659,36 @@
                 React.createElement('div', { className: 'grid grid-cols-2 gap-4' },
                   React.createElement('div', { className: 'stat-card' }, React.createElement('div', { className: 'stat-value' }, stats.totalSevens), React.createElement('div', { className: 'stat-label' }, 'Sevens Rolled')),
                   React.createElement('div', { className: 'stat-card' }, React.createElement('div', { className: 'stat-value' }, stats.totalDoubles), React.createElement('div', { className: 'stat-label' }, 'Doubles Rolled')),
+                  // Most sevens/doubles player awards
+                  mostSevensPlayer && mostSevensPlayer.count > 0 && React.createElement('div', { className: 'stat-card', style: { background: 'rgba(234, 88, 12, 0.1)' } },
+                    React.createElement('div', { className: 'stat-value', style: { fontSize: '1.25rem', color: '#ea580c' } }, mostSevensPlayer.name),
+                    React.createElement('div', { className: 'stat-label' }, 'Lucky 7 Magnet (' + mostSevensPlayer.count + ')')
+                  ),
+                  mostDoublesPlayer && mostDoublesPlayer.count > 0 && React.createElement('div', { className: 'stat-card', style: { background: 'rgba(147, 51, 234, 0.1)' } },
+                    React.createElement('div', { className: 'stat-value', style: { fontSize: '1.25rem', color: '#9333ea' } }, mostDoublesPlayer.name),
+                    React.createElement('div', { className: 'stat-label' }, 'Double Trouble (' + mostDoublesPlayer.count + ')')
+                  ),
                   stats.biggestBankPlayer && React.createElement('div', { className: 'col-span-2 stat-card', style: { background: 'rgba(5, 150, 105, 0.1)' } },
                     React.createElement('div', { className: 'stat-value', style: { color: 'var(--text-accent)' } }, stats.biggestBank),
                     React.createElement('div', { className: 'stat-label' }, 'Biggest Bank (' + stats.biggestBankPlayer + ')')
+                  ),
+                  // Conservative/Risky player awards
+                  conservativePlayer && React.createElement('div', { className: 'stat-card award-card', style: { background: 'rgba(59, 130, 246, 0.1)' } },
+                    React.createElement('div', { className: 'award-emoji' }, '\uD83D\uDEE1\uFE0F'),
+                    React.createElement('div', { className: 'stat-value', style: { fontSize: '1.25rem', color: '#3b82f6' } }, conservativePlayer.name),
+                    React.createElement('div', { className: 'stat-label' }, 'The Safe Player')
+                  ),
+                  riskyPlayer && React.createElement('div', { className: 'stat-card award-card', style: { background: 'rgba(239, 68, 68, 0.1)' } },
+                    React.createElement('div', { className: 'award-emoji' }, '\uD83D\uDD25'),
+                    React.createElement('div', { className: 'stat-value', style: { fontSize: '1.25rem', color: '#ef4444' } }, riskyPlayer.name),
+                    React.createElement('div', { className: 'stat-label' }, 'The Daredevil')
                   )
                 )
               ),
               React.createElement('div', { className: 'shareable-footer' },
                 React.createElement('span', null, today),
                 React.createElement('span', null, ' • '),
-                React.createElement('span', { style: { fontWeight: 600 } }, 'Bank Dice Game')
+                React.createElement('span', { style: { fontWeight: 600 } }, 'bennorris.com/bank')
               )
             ),
             // Action buttons (outside shareable area)
