@@ -1494,6 +1494,8 @@
             React.createElement(HelpCircle, { size: 16 }),
             'How to Play'
           ),
+          // Divider
+          React.createElement('div', { style: { borderTop: '1px solid var(--border-color)', margin: '0.5rem 0' } }),
           // Restart button
           React.createElement('button', {
             className: 'settings-item-btn danger',
@@ -2421,17 +2423,7 @@
           ),
           // Player sidebar - sorted by actual score, with rank badges showing position coming into round
           React.createElement('div', { className: 'game-sidebar card p-4' },
-            React.createElement('div', { className: 'flex items-center justify-between mb-3' },
-              React.createElement('h2', { className: 'text-lg font-bold flex items-center gap-2', style: { marginBottom: 0 } }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players'),
-              React.createElement('button', {
-                className: 'new-to-bank-btn',
-                onClick: function() { setShowInstructions(true); },
-                title: 'How to play Bank'
-              },
-                React.createElement(HelpCircle, { size: 14 }),
-                isWideScreen ? 'New to Bank?' : 'New'
-              )
-            ),
+            React.createElement('h2', { className: 'text-lg font-bold flex items-center gap-2 mb-3' }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players'),
             React.createElement('div', { className: 'flex flex-col gap-2' },
               (function() {
                 // Calculate ranks based on cumulative score (position coming into round)
