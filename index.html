@@ -1368,6 +1368,10 @@
       var onRestart = props.onRestart;
       var onShowInstructions = props.onShowInstructions;
 
+      // Check if party mode has been discovered (stored in localStorage)
+      var partyDiscovered = false;
+      try { partyDiscovered = localStorage.getItem('bank-party-discovered') === 'true'; } catch (e) { /* ignore */ }
+
       if (!isOpen) return null;
 
       var minRounds = state.currentRound;
@@ -1424,8 +1428,8 @@
               }, React.createElement(Moon, { size: 16 }))
             )
           ),
-          // Party Mode toggle (only show if active)
-          state.settings.partyMode && React.createElement('div', { className: 'settings-item' },
+          // Party Mode toggle (show if discovered or active)
+          (partyDiscovered || state.settings.partyMode) && React.createElement('div', { className: 'settings-item' },
             React.createElement('div', null,
               React.createElement('div', { className: 'settings-item-label' }, '\uD83C\uDF89', 'Party Mode'),
               React.createElement('div', { className: 'settings-item-sublabel' }, 'Neon disco theme')
@@ -2036,13 +2040,14 @@
         var name = newPlayerName.trim();
         // Secret party mode activation
         if (name.toLowerCase() === 'party mode') {
-          dispatch({ type: 'TOGGLE_PARTY_MODE' });
-          setNewPlayerName('');
-          if (inputRef.current) inputRef.current.focus();
-          // Launch confetti when enabling party mode
+          // Store discovery flag so toggle appears in settings from now on
+          try { localStorage.setItem('bank-party-discovered', 'true'); } catch (e) { /* ignore */ }
           if (!state.settings.partyMode) {
+            dispatch({ type: 'TOGGLE_PARTY_MODE' });
             launchConfetti('big');
           }
+          setNewPlayerName('');
+          if (inputRef.current) inputRef.current.focus();
           return;
         }
         if (name && state.players.length < MAX_PLAYERS) {
