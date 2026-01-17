@@ -1551,7 +1551,7 @@
         if (mostDoublesPlayer && mostDoublesPlayer.count > 0) lines.push('Double Trouble: ' + mostDoublesPlayer.name + ' (' + mostDoublesPlayer.count + ')');
         if (stats.biggestBankPlayer) lines.push('Biggest Bank: ' + stats.biggestBank + ' (' + stats.biggestBankPlayer + ')');
         if (conservativePlayer) lines.push('🛡️ The Safe Player: ' + conservativePlayer.name);
-        if (riskyPlayer) lines.push('🎲 The Daredevil: ' + riskyPlayer.name);
+        if (riskyPlayer) lines.push('🔥 The Daredevil: ' + riskyPlayer.name);
         lines.push('', 'Play Bank: https://bennorris.com/bank');
         var text = lines.join('\n');
 
@@ -1679,7 +1679,7 @@
                     React.createElement('div', { className: 'stat-label' }, 'The Safe Player')
                   ),
                   riskyPlayer && React.createElement('div', { className: 'stat-card award-card', style: { background: 'rgba(239, 68, 68, 0.1)' } },
-                    React.createElement('div', { className: 'award-emoji' }, '\uD83C\uDFB2'),
+                    React.createElement('div', { className: 'award-emoji' }, '\uD83D\uDD25'),
                     React.createElement('div', { className: 'stat-value', style: { fontSize: '1.25rem', color: '#ef4444' } }, riskyPlayer.name),
                     React.createElement('div', { className: 'stat-label' }, 'The Daredevil')
                   )
