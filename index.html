@@ -70,6 +70,205 @@
       --border-color: #334155;
       --header-bg: linear-gradient(135deg, #047857 0%, #0f766e 100%);
     }
+
+    /* Party Mode Theme - Neon Disco */
+    .party {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #1a1a2e;
+      --bg-tertiary: #252540;
+      --bg-safe: linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,212,255,0.2) 100%);
+      --bg-danger: linear-gradient(135deg, rgba(255,0,128,0.25) 0%, rgba(255,102,0,0.25) 100%);
+      --bg-dice: linear-gradient(135deg, rgba(138,43,226,0.4) 0%, rgba(0,212,255,0.3) 100%);
+      --text-primary: #ffffff;
+      --text-secondary: #b8b8d0;
+      --text-accent: #00ff88;
+      --border-color: #3d3d5c;
+      --header-bg: linear-gradient(270deg, #ff0080, #ff8c00, #ffff00, #00ff88, #00d4ff, #8a2be2, #ff0080);
+      --header-bg-size: 400% 400%;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -4px rgba(0,0,0,0.3);
+    }
+
+    /* Animated rainbow header for party mode */
+    .party .header {
+      background: linear-gradient(270deg, #ff0080, #ff8c00, #ffff00, #00ff88, #00d4ff, #8a2be2, #ff0080);
+      background-size: 400% 400%;
+      animation: party-gradient 8s ease infinite;
+    }
+
+    @keyframes party-gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Neon glow on buttons */
+    .party .btn-primary {
+      background: linear-gradient(135deg, #ff0080 0%, #8a2be2 100%);
+      box-shadow: 0 0 20px rgba(255,0,128,0.4), 0 0 40px rgba(138,43,226,0.2);
+    }
+    .party .btn-primary:not(:disabled):hover {
+      box-shadow: 0 0 30px rgba(255,0,128,0.6), 0 0 60px rgba(138,43,226,0.3);
+    }
+
+    /* Pulsing glow on bank button */
+    .party .bank-btn {
+      background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
+      color: #0a0a0f;
+      box-shadow: 0 0 20px rgba(0,255,136,0.4), 0 0 40px rgba(0,212,255,0.2);
+      animation: party-pulse 2s ease-in-out infinite;
+    }
+    .party .bank-btn:not(:disabled):hover {
+      box-shadow: 0 0 30px rgba(0,255,136,0.6), 0 0 60px rgba(0,212,255,0.4);
+    }
+    .party .bank-btn:disabled {
+      background: var(--bg-tertiary);
+      box-shadow: none;
+      animation: none;
+    }
+
+    @keyframes party-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,255,136,0.4), 0 0 40px rgba(0,212,255,0.2); }
+      50% { box-shadow: 0 0 30px rgba(0,255,136,0.6), 0 0 60px rgba(0,212,255,0.4); }
+    }
+
+    /* Rainbow shimmer border on cards */
+    .party .card {
+      position: relative;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    .party .card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      background: linear-gradient(270deg, #ff0080, #ff8c00, #ffff00, #00ff88, #00d4ff, #8a2be2, #ff0080);
+      background-size: 400% 400%;
+      animation: party-gradient 8s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    /* Neon dice glow */
+    .party .dice-container {
+      background: linear-gradient(135deg, rgba(138,43,226,0.3) 0%, rgba(0,212,255,0.2) 100%);
+      box-shadow: 0 0 20px rgba(138,43,226,0.3), 0 0 40px rgba(0,212,255,0.2);
+    }
+    .party .dice-container:not(.disabled):hover {
+      box-shadow: 0 0 30px rgba(138,43,226,0.5), 0 0 60px rgba(0,212,255,0.3);
+    }
+    .party .die {
+      box-shadow: 0 0 15px rgba(255,255,255,0.3), var(--shadow-lg);
+    }
+
+    /* Neon keypad buttons */
+    .party .keypad-btn {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(138,43,226,0.3);
+      box-shadow: 0 0 10px rgba(138,43,226,0.2);
+    }
+    .party .keypad-btn:not(:disabled):hover {
+      border-color: rgba(0,212,255,0.6);
+      box-shadow: 0 0 15px rgba(0,212,255,0.4);
+    }
+    .party .keypad-btn-seven-safe {
+      background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
+      color: #0a0a0f;
+      box-shadow: 0 0 15px rgba(0,255,136,0.4);
+    }
+    .party .keypad-btn-seven-danger {
+      background: linear-gradient(135deg, #ff0080 0%, #ff3366 100%);
+      box-shadow: 0 0 15px rgba(255,0,128,0.4);
+    }
+    .party .keypad-btn-doubles {
+      background: linear-gradient(135deg, #ffff00 0%, #ff8c00 100%);
+      color: #0a0a0f;
+      box-shadow: 0 0 15px rgba(255,255,0,0.4);
+    }
+
+    /* Player card glow for current turn */
+    .party .player-card.current-turn {
+      background: rgba(0,255,136,0.15);
+      border-color: #00ff88;
+      box-shadow: 0 0 15px rgba(0,255,136,0.3);
+    }
+    .party .player-card-indicator {
+      background: #00ff88;
+      box-shadow: 0 0 10px rgba(0,255,136,0.5);
+    }
+
+    /* Neon toggle */
+    .party .toggle.active {
+      background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
+      box-shadow: 0 0 10px rgba(0,255,136,0.4);
+    }
+
+    /* Party mode effect pills */
+    .party .effect-pill.safe { background: rgba(0,255,136,0.2); color: #00ff88; }
+    .party .effect-pill.danger { background: rgba(255,0,128,0.2); color: #ff0080; }
+    .party .effect-pill.doubles { background: rgba(255,255,0,0.2); color: #ffff00; }
+
+    /* Header round badge */
+    .party .header-round { background: rgba(0,0,0,0.3); }
+    .party .header-round.final {
+      background: linear-gradient(135deg, #ff0080 0%, #ff3366 100%);
+      animation: party-pulse-danger 2s ease-in-out infinite;
+    }
+    @keyframes party-pulse-danger {
+      0%, 100% { box-shadow: 0 0 10px rgba(255,0,128,0.5); }
+      50% { box-shadow: 0 0 20px rgba(255,0,128,0.8); }
+    }
+
+    /* Modal styling for party mode */
+    .party .modal-header {
+      background: linear-gradient(270deg, #ff0080, #8a2be2, #00d4ff);
+      background-size: 200% 200%;
+      animation: party-gradient 4s ease infinite;
+    }
+
+    /* Party mode indicator */
+    .party-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.15);
+      animation: party-indicator-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes party-indicator-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Confetti canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Respect reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      .party .header,
+      .party .card::before,
+      .party .bank-btn,
+      .party .modal-header,
+      .party-indicator {
+        animation: none;
+      }
+      .party .header { background: linear-gradient(135deg, #8a2be2 0%, #00d4ff 100%); }
+      .party .card::before { background: linear-gradient(135deg, #8a2be2 0%, #00d4ff 100%); }
+    }
+
     html, body, #root { height: 100%; overflow: hidden; }
     body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); overscroll-behavior: none; line-height: 1.5; -webkit-font-smoothing: antialiased; }
     body.modal-open { overflow: hidden; }
@@ -589,8 +788,86 @@
       lastRollEffect: null,
       history: [],
       stats: { totalSevens: 0, totalDoubles: 0, biggestBank: 0, biggestBankPlayer: null },
-      settings: { virtualDice: false, theme: 'system' }
+      settings: { virtualDice: false, theme: 'system', partyMode: false }
     };
+
+    // Confetti animation system for party mode
+    var confettiColors = ['#ff0080', '#ff8c00', '#ffff00', '#00ff88', '#00d4ff', '#8a2be2'];
+
+    function launchConfetti(intensity) {
+      intensity = intensity || 'normal';
+      var canvas = document.getElementById('confetti-canvas');
+      if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = 'confetti-canvas';
+        document.body.appendChild(canvas);
+      }
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      var ctx = canvas.getContext('2d');
+
+      var particleCount = intensity === 'big' ? 150 : 80;
+      var particles = [];
+
+      for (var i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          vx: (Math.random() - 0.5) * 8,
+          vy: Math.random() * 3 + 2,
+          color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+          size: Math.random() * 8 + 4,
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 10,
+          shape: Math.random() > 0.5 ? 'rect' : 'circle'
+        });
+      }
+
+      var animationFrame;
+      var startTime = Date.now();
+      var duration = intensity === 'big' ? 3000 : 2000;
+
+      function animate() {
+        var elapsed = Date.now() - startTime;
+        if (elapsed > duration) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          cancelAnimationFrame(animationFrame);
+          return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(function(p) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.1;
+          p.rotation += p.rotationSpeed;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation * Math.PI / 180);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, 1 - (elapsed / duration) * 0.5);
+
+          if (p.shape === 'rect') {
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.restore();
+        });
+
+        animationFrame = requestAnimationFrame(animate);
+      }
+
+      // Check for reduced motion preference
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        animate();
+      }
+    }
 
     // Load state from localStorage
     function loadState() {
@@ -651,6 +928,8 @@
           return Object.assign({}, state, { settings: newSettings });
         case 'SET_THEME':
           return Object.assign({}, state, { settings: Object.assign({}, state.settings, { theme: action.theme }) });
+        case 'TOGGLE_PARTY_MODE':
+          return Object.assign({}, state, { settings: Object.assign({}, state.settings, { partyMode: !state.settings.partyMode }) });
         case 'START_GAME':
           return Object.assign({}, state, {
             phase: 'playing', currentRound: 1, rollCount: 0, bankTotal: 0, currentPlayerIndex: 0,
@@ -1172,6 +1451,19 @@
                 onClick: function() { dispatch({ type: 'SET_THEME', theme: 'dark' }); },
                 title: 'Dark'
               }, React.createElement(Moon, { size: 16 }))
+            )
+          ),
+          // Party Mode toggle (only show if active)
+          state.settings.partyMode && React.createElement('div', { className: 'settings-item' },
+            React.createElement('div', null,
+              React.createElement('div', { className: 'settings-item-label' }, '\uD83C\uDF89', 'Party Mode'),
+              React.createElement('div', { className: 'settings-item-sublabel' }, 'Neon disco theme')
+            ),
+            React.createElement('div', {
+              className: 'toggle' + (state.settings.partyMode ? ' active' : ''),
+              onClick: function() { dispatch({ type: 'TOGGLE_PARTY_MODE' }); }
+            },
+              React.createElement('div', { className: 'toggle-knob' })
             )
           ),
           // Rounds stepper
@@ -1846,6 +2138,17 @@
 
       var addPlayer = function() {
         var name = newPlayerName.trim();
+        // Secret party mode activation
+        if (name.toLowerCase() === 'party mode') {
+          dispatch({ type: 'TOGGLE_PARTY_MODE' });
+          setNewPlayerName('');
+          if (inputRef.current) inputRef.current.focus();
+          // Launch confetti when enabling party mode
+          if (!state.settings.partyMode) {
+            launchConfetti('big');
+          }
+          return;
+        }
         if (name && state.players.length < MAX_PLAYERS) {
           dispatch({ type: 'ADD_PLAYER', name: name });
           setNewPlayerName('');
@@ -1894,9 +2197,12 @@
       return React.createElement('div', { className: 'app-container' },
         React.createElement('div', { className: 'header' },
           React.createElement('div', { className: 'header-content' },
-            React.createElement('div', { className: 'header-brand' },
-              React.createElement('div', { className: 'brand-icon' }, React.createElement(BankIcon, { size: 22 })),
-              React.createElement('h1', { className: 'header-title' }, 'BANK')
+            React.createElement('div', { className: 'header-left' },
+              React.createElement('div', { className: 'header-brand' },
+                React.createElement('div', { className: 'brand-icon' }, React.createElement(BankIcon, { size: 22 })),
+                React.createElement('h1', { className: 'header-title' }, 'BANK')
+              ),
+              state.settings.partyMode && React.createElement('span', { className: 'party-indicator' }, '\uD83C\uDF89 Party Mode')
             ),
             React.createElement('button', { onClick: function() {
                 var nextTheme = state.settings.theme === 'system' ? 'light' : state.settings.theme === 'light' ? 'dark' : 'system';
@@ -1997,6 +2303,13 @@
         return function() { window.removeEventListener('resize', handleResize); };
       }, []);
 
+      // Trigger confetti on doubles in party mode
+      useEffect(function() {
+        if (state.settings.partyMode && state.lastRollEffect === '\u00d72') {
+          launchConfetti('normal');
+        }
+      }, [state.lastRollEffect, state.settings.partyMode, state.rollCount]);
+
       var isInSafeZone = state.rollCount < 3;
       var currentPlayer = state.players[state.currentPlayerIndex];
       var activePlayers = state.players.filter(function(p) { return !p.hasBanked; });
@@ -2027,6 +2340,7 @@
                 React.createElement('div', { className: 'brand-icon' }, React.createElement(BankIcon, { size: 22 })),
                 React.createElement('h1', { className: 'header-title' }, 'BANK')
               ),
+              state.settings.partyMode && React.createElement('span', { className: 'party-indicator' }, '\uD83C\uDF89'),
               (function() {
                 var isFinalRound = state.currentRound === state.roundConfig && state.phase !== 'setup' && state.phase !== 'gameOver';
                 return React.createElement('div', { className: 'header-round' + (isFinalRound ? ' final' : '') },
@@ -2204,6 +2518,15 @@
           return function() { mediaQuery.removeEventListener('change', handler); };
         }
       }, [state.settings.theme]);
+
+      // Apply party mode class
+      useEffect(function() {
+        if (state.settings.partyMode) {
+          document.documentElement.classList.add('party');
+        } else {
+          document.documentElement.classList.remove('party');
+        }
+      }, [state.settings.partyMode]);
 
       useEffect(function() {
         if (state.phase === 'roundEnd') { setWasBust(state.lastRollEffect === 'BUST!'); setShowRoundEnd(true); }
