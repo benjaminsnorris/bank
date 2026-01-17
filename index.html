@@ -631,38 +631,6 @@
     
     .flex { display: flex; } .flex-col { flex-direction: column; } .flex-1 { flex: 1; } .items-center { align-items: center; } .justify-center { justify-content: center; } .justify-between { justify-content: space-between; } .gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } .gap-4 { gap: 1rem; } .grid { display: grid; } .grid-cols-2 { grid-template-columns: repeat(2, 1fr); } .grid-cols-4 { grid-template-columns: repeat(4, 1fr); } .grid-cols-5 { grid-template-columns: repeat(5, 1fr); } .col-span-2 { grid-column: span 2; } .w-full { width: 100%; } .min-w-0 { min-width: 0; } .p-4 { padding: 1rem; } .p-5 { padding: 1.25rem; } .p-6 { padding: 1.5rem; } .mb-2 { margin-bottom: 0.5rem; } .mb-3 { margin-bottom: 0.75rem; } .mb-4 { margin-bottom: 1rem; } .mb-6 { margin-bottom: 1.5rem; } .mt-3 { margin-top: 0.75rem; } .text-sm { font-size: 0.875rem; } .text-lg { font-size: 1.125rem; } .text-xl { font-size: 1.25rem; } .text-2xl { font-size: 1.5rem; } .text-3xl { font-size: 1.875rem; } .text-4xl { font-size: 2.25rem; } .text-5xl { font-size: 3rem; } .font-medium { font-weight: 500; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; } .text-center { text-align: center; } .text-right { text-align: right; } .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .rounded-lg { border-radius: 0.5rem; } .rounded-xl { border-radius: 0.75rem; } .overflow-y-auto { overflow-y: auto; } .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
 
-    /* How to Play accordion */
-    .how-to-play { overflow: hidden; }
-    .how-to-play-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; background: transparent; border: none; cursor: pointer; font-family: inherit; text-align: left; color: var(--text-primary); }
-    .how-to-play-toggle:hover { background: var(--bg-tertiary); }
-    .how-to-play-header { display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 600; }
-    .how-to-play-header svg { color: var(--text-accent); }
-    .how-to-play-chevron { color: var(--text-secondary); transition: transform 0.2s ease; }
-    .how-to-play-chevron.open { transform: rotate(180deg); }
-    .how-to-play-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-    .how-to-play-content.open { max-height: 600px; }
-    .how-to-play-inner { padding: 0 1.25rem 1.25rem; }
-    .rule-zone { border-radius: 0.75rem; padding: 0.875rem 1rem; margin-bottom: 0.75rem; }
-    .rule-zone:last-child { margin-bottom: 0; }
-    .rule-zone-safe { background: var(--bg-safe); }
-    .rule-zone-danger { background: var(--bg-danger); }
-    .rule-zone-bank { background: linear-gradient(135deg, rgba(5,150,105,0.15) 0%, rgba(13,148,136,0.15) 100%); border: 2px solid var(--text-accent); }
-    .rule-zone-title { font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.375rem; }
-    .rule-zone-safe .rule-zone-title { color: #059669; }
-    .dark .rule-zone-safe .rule-zone-title { color: #34d399; }
-    .rule-zone-danger .rule-zone-title { color: #dc2626; }
-    .dark .rule-zone-danger .rule-zone-title { color: #f87171; }
-    .rule-zone-bank .rule-zone-title { color: var(--text-accent); }
-    .rule-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-primary); padding: 0.25rem 0; }
-    .rule-badge { display: inline-flex; align-items: center; justify-content: center; padding: 0.125rem 0.5rem; border-radius: 0.375rem; font-weight: 700; font-size: 0.75rem; background: rgba(0,0,0,0.1); }
-    .dark .rule-badge { background: rgba(255,255,255,0.15); }
-    .rule-badge-safe { background: rgba(5,150,105,0.2); color: #059669; }
-    .dark .rule-badge-safe { background: rgba(52,211,153,0.2); color: #34d399; }
-    .rule-badge-danger { background: rgba(220,38,38,0.2); color: #dc2626; }
-    .dark .rule-badge-danger { background: rgba(248,113,113,0.2); color: #f87171; }
-    .rule-badge-double { background: rgba(217,119,6,0.2); color: #d97706; }
-    .dark .rule-badge-double { background: rgba(251,191,36,0.2); color: #fbbf24; }
-
     /* Fullscreen Instructions Modal */
     .fullscreen-modal-backdrop { position: fixed; inset: 0; background: var(--bg-primary); z-index: 200; display: flex; flex-direction: column; overflow: hidden; }
     .fullscreen-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: var(--header-bg); color: white; flex-shrink: 0; }
@@ -694,11 +662,6 @@
     .fullscreen-modal-badge-double { background: rgba(217,119,6,0.2); color: #d97706; }
     .dark .fullscreen-modal-badge-double { background: rgba(251,191,36,0.2); color: #fbbf24; }
 
-    /* New to Bank button */
-    .new-to-bank-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; transition: all 0.2s; white-space: nowrap; }
-    .new-to-bank-btn:hover { border-color: var(--text-accent); color: var(--text-accent); background: rgba(5,150,105,0.05); }
-    .new-to-bank-btn svg { flex-shrink: 0; }
-
     /* Setup player card with virtual dice toggle */
     .setup-player-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; background: var(--bg-tertiary); position: relative; }
     .setup-player-card.dragging { opacity: 0.8; box-shadow: var(--shadow-lg); z-index: 10; transform: scale(1.02); }
@@ -713,10 +676,15 @@
     .toggle-small-knob { position: absolute; top: 2px; left: 2px; width: 0.75rem; height: 0.75rem; border-radius: 9999px; background: white; box-shadow: var(--shadow-sm); transition: transform 0.2s; }
     .toggle-small.active .toggle-small-knob { transform: translateX(1rem); }
 
-    /* Two-column layout for player cards on wider screens */
+    /* Setup players list */
     .setup-players-grid { display: flex; flex-direction: column; gap: 0.5rem; }
-    @media (min-width: 500px) {
-      .setup-players-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+
+    /* Two-column layout for setup screen on wider screens */
+    .setup-layout { display: flex; flex-direction: column; gap: 1.5rem; max-width: 56rem; margin: 0 auto; }
+    .setup-column { display: flex; flex-direction: column; }
+    @media (min-width: 768px) {
+      .setup-layout { flex-direction: row; align-items: flex-start; }
+      .setup-column { flex: 1; }
     }
   </style>
 </head>
@@ -906,8 +874,11 @@
       switch (action.type) {
         case 'ADD_PLAYER':
           if (state.players.length >= MAX_PLAYERS) return state;
+          // Default virtual dice based on majority of existing players (default off if no players or equal split)
+          var virtualDiceCount = state.players.filter(function(p) { return p.virtualDice; }).length;
+          var defaultVirtualDice = state.players.length > 0 && virtualDiceCount > state.players.length / 2;
           return Object.assign({}, state, {
-            players: state.players.concat([{ id: Date.now(), name: action.name, cumulativeScore: 0, roundScore: null, hasBanked: false, doublesRolled: 0, sevensRolled: 0, bankRolls: [], virtualDice: true }])
+            players: state.players.concat([{ id: Date.now(), name: action.name, cumulativeScore: 0, roundScore: null, hasBanked: false, doublesRolled: 0, sevensRolled: 0, bankRolls: [], virtualDice: defaultVirtualDice }])
           });
         case 'TOGGLE_PLAYER_VIRTUAL_DICE':
           return Object.assign({}, state, {
@@ -2046,83 +2017,6 @@
       );
     }
 
-    // How to Play accordion component
-    function HowToPlay() {
-      var expandedState = useState(function() {
-        try { return localStorage.getItem('bank-tutorial-expanded') === 'true'; }
-        catch (e) { return false; }
-      });
-      var isExpanded = expandedState[0];
-      var setIsExpanded = expandedState[1];
-
-      var toggle = function() {
-        var newVal = !isExpanded;
-        setIsExpanded(newVal);
-        try { localStorage.setItem('bank-tutorial-expanded', newVal ? 'true' : 'false'); }
-        catch (e) { /* ignore */ }
-      };
-
-      return React.createElement('div', { className: 'card how-to-play mb-6' },
-        React.createElement('button', { className: 'how-to-play-toggle', onClick: toggle },
-          React.createElement('div', { className: 'how-to-play-header' },
-            React.createElement(HelpCircle, { size: 20 }),
-            'New to Bank?'
-          ),
-          React.createElement(ChevronDown, { size: 20, className: 'how-to-play-chevron' + (isExpanded ? ' open' : '') })
-        ),
-        React.createElement('div', { className: 'how-to-play-content' + (isExpanded ? ' open' : '') },
-          React.createElement('div', { className: 'how-to-play-inner' },
-            // Intro
-            React.createElement('p', { style: { fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.875rem', lineHeight: 1.5 } },
-              'Everyone takes turns rolling dice to grow the pot. The question is: do you bank your points now, or risk it all for more?'
-            ),
-            // Safe Zone
-            React.createElement('div', { className: 'rule-zone rule-zone-safe' },
-              React.createElement('div', { className: 'rule-zone-title' },
-                React.createElement(Shield, { size: 14 }),
-                'Safe Zone (First 3 Rolls)'
-              ),
-              React.createElement('div', { className: 'rule-item' },
-                React.createElement('span', { className: 'rule-badge rule-badge-safe' }, '7'),
-                'Lucky! Get +70 bonus points'
-              ),
-              React.createElement('div', { className: 'rule-item' },
-                'Other rolls add to your bank'
-              )
-            ),
-            // Danger Zone
-            React.createElement('div', { className: 'rule-zone rule-zone-danger' },
-              React.createElement('div', { className: 'rule-zone-title' },
-                React.createElement(AlertTriangle, { size: 14 }),
-                'Danger Zone (4+ Rolls)'
-              ),
-              React.createElement('div', { className: 'rule-item' },
-                React.createElement('span', { className: 'rule-badge rule-badge-danger' }, '7'),
-                'BUST! Lose everything this round'
-              ),
-              React.createElement('div', { className: 'rule-item' },
-                React.createElement('span', { className: 'rule-badge rule-badge-double' }, 'Doubles'),
-                'Double your bank total!'
-              )
-            ),
-            // Banking
-            React.createElement('div', { className: 'rule-zone rule-zone-bank' },
-              React.createElement('div', { className: 'rule-zone-title' },
-                React.createElement(BankIcon, { size: 14 }),
-                'Bank It!'
-              ),
-              React.createElement('div', { className: 'rule-item' },
-                'Tap BANK anytime to lock in your points'
-              ),
-              React.createElement('div', { className: 'rule-item' },
-                'Highest score after all rounds wins!'
-              )
-            )
-          )
-        )
-      );
-    }
-
     // Setup Screen
     function SetupScreen(props) {
       var state = props.state;
@@ -2217,63 +2111,68 @@
           )
         ),
         React.createElement('div', { style: { flex: 1, overflowY: 'auto', padding: '1rem' } },
-          React.createElement('div', { style: { maxWidth: '28rem', margin: '0 auto' } },
-            React.createElement('div', { className: 'card p-5 mb-6' },
-              React.createElement('h2', { className: 'text-lg font-bold mb-4 flex items-center gap-2' }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players (' + state.players.length + ')'),
-              React.createElement('div', { className: 'flex gap-2 mb-4' },
-                React.createElement('input', { ref: inputRef, type: 'text', value: newPlayerName, onChange: function(e) { setNewPlayerName(e.target.value); }, onKeyPress: function(e) { if (e.key === 'Enter') addPlayer(); }, placeholder: 'Enter player name', maxLength: 20, className: 'input', style: { flex: 1 } }),
-                React.createElement('button', { onClick: addPlayer, disabled: !newPlayerName.trim() || state.players.length >= MAX_PLAYERS, className: 'btn btn-primary', style: { padding: '0.75rem' } },
-                  React.createElement(Plus, { size: 20 })
+          React.createElement('div', { className: 'setup-layout' },
+            // Left column - Players
+            React.createElement('div', { className: 'setup-column' },
+              React.createElement('div', { className: 'card p-5' },
+                React.createElement('h2', { className: 'text-lg font-bold mb-4 flex items-center gap-2' }, React.createElement(Users, { size: 20, style: { color: 'var(--text-accent)' } }), ' Players (' + state.players.length + ')'),
+                React.createElement('div', { className: 'flex gap-2 mb-4' },
+                  React.createElement('input', { ref: inputRef, type: 'text', value: newPlayerName, onChange: function(e) { setNewPlayerName(e.target.value); }, onKeyPress: function(e) { if (e.key === 'Enter') addPlayer(); }, placeholder: 'Enter player name', maxLength: 20, className: 'input', style: { flex: 1 } }),
+                  React.createElement('button', { onClick: addPlayer, disabled: !newPlayerName.trim() || state.players.length >= MAX_PLAYERS, className: 'btn btn-primary', style: { padding: '0.75rem' } },
+                    React.createElement(Plus, { size: 20 })
+                  )
+                ),
+                React.createElement('div', { className: 'setup-players-grid' },
+                  state.players.length === 0 ?
+                    React.createElement('div', { className: 'text-center py-8', style: { color: 'var(--text-secondary)' } }, 'Add at least ' + MIN_PLAYERS + ' players to start') :
+                    state.players.map(function(player, index) {
+                      return React.createElement(SetupPlayerCard, {
+                        key: player.id,
+                        player: player,
+                        index: index,
+                        onRemove: function(id) { dispatch({ type: 'REMOVE_PLAYER', id: id }); },
+                        onToggleVirtualDice: function(playerId) { dispatch({ type: 'TOGGLE_PLAYER_VIRTUAL_DICE', playerId: playerId }); },
+                        onPointerDragStart: handlePointerDragStart,
+                        onPointerMove: handlePointerMove,
+                        onPointerDragEnd: handlePointerDragEnd,
+                        isDragging: dragInfo.draggingIndex === index,
+                        isDragOver: dragInfo.dragOverIndex === index,
+                        isAnyDragging: dragInfo.draggingIndex !== null
+                      });
+                    })
+                )
+              )
+            ),
+            // Right column - Game Settings and Start button
+            React.createElement('div', { className: 'setup-column' },
+              React.createElement('div', { className: 'card p-5 mb-4' },
+                React.createElement('h2', { className: 'text-lg font-bold mb-4 flex items-center gap-2' }, React.createElement(Settings, { size: 20, style: { color: 'var(--text-accent)' } }), ' Game Settings'),
+                React.createElement('div', null,
+                  React.createElement('label', { style: { display: 'block', fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '0.5rem' } }, 'Number of Rounds'),
+                  React.createElement('div', { className: 'round-options' },
+                    ROUND_PRESETS.map(function(rounds) {
+                      var isActive = !state.isCustomRounds && state.roundConfig === rounds;
+                      return React.createElement('button', { key: rounds, onClick: function() { handlePresetClick(rounds); }, className: 'round-option' + (isActive ? ' active' : '') }, rounds);
+                    }),
+                    React.createElement('button', { onClick: handleCustomClick, className: 'round-option' + (state.isCustomRounds ? ' active' : '') }, 'Custom')
+                  ),
+                  state.isCustomRounds && React.createElement('div', { className: 'custom-rounds-input mt-3' },
+                    React.createElement('input', {
+                      type: 'text',
+                      inputMode: 'numeric',
+                      value: customRoundsInput || (state.isCustomRounds && ROUND_PRESETS.indexOf(state.roundConfig) === -1 ? state.roundConfig : ''),
+                      onChange: handleCustomInputChange,
+                      placeholder: '#',
+                      maxLength: 2,
+                      className: 'input input-small'
+                    }),
+                    React.createElement('span', { style: { color: 'var(--text-secondary)' } }, 'rounds')
+                  )
                 )
               ),
-              React.createElement('div', { className: 'setup-players-grid' },
-                state.players.length === 0 ?
-                  React.createElement('div', { className: 'text-center py-8', style: { color: 'var(--text-secondary)', gridColumn: '1 / -1' } }, 'Add at least ' + MIN_PLAYERS + ' players to start') :
-                  state.players.map(function(player, index) {
-                    return React.createElement(SetupPlayerCard, {
-                      key: player.id,
-                      player: player,
-                      index: index,
-                      onRemove: function(id) { dispatch({ type: 'REMOVE_PLAYER', id: id }); },
-                      onToggleVirtualDice: function(playerId) { dispatch({ type: 'TOGGLE_PLAYER_VIRTUAL_DICE', playerId: playerId }); },
-                      onPointerDragStart: handlePointerDragStart,
-                      onPointerMove: handlePointerMove,
-                      onPointerDragEnd: handlePointerDragEnd,
-                      isDragging: dragInfo.draggingIndex === index,
-                      isDragOver: dragInfo.dragOverIndex === index,
-                      isAnyDragging: dragInfo.draggingIndex !== null
-                    });
-                  })
+              React.createElement('button', { onClick: function() { dispatch({ type: 'START_GAME' }); }, disabled: state.players.length < MIN_PLAYERS, className: 'btn btn-primary btn-large w-full' },
+                React.createElement(Play, { size: 24 }), ' Start Game'
               )
-            ),
-            React.createElement('div', { className: 'card p-5 mb-6' },
-              React.createElement('h2', { className: 'text-lg font-bold mb-4 flex items-center gap-2' }, React.createElement(Settings, { size: 20, style: { color: 'var(--text-accent)' } }), ' Game Settings'),
-              React.createElement('div', { className: 'mb-4' },
-                React.createElement('label', { style: { display: 'block', fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '0.5rem' } }, 'Number of Rounds'),
-                React.createElement('div', { className: 'round-options' },
-                  ROUND_PRESETS.map(function(rounds) {
-                    var isActive = !state.isCustomRounds && state.roundConfig === rounds;
-                    return React.createElement('button', { key: rounds, onClick: function() { handlePresetClick(rounds); }, className: 'round-option' + (isActive ? ' active' : '') }, rounds);
-                  }),
-                  React.createElement('button', { onClick: handleCustomClick, className: 'round-option' + (state.isCustomRounds ? ' active' : '') }, 'Custom')
-                ),
-                state.isCustomRounds && React.createElement('div', { className: 'custom-rounds-input mt-3' },
-                  React.createElement('input', {
-                    type: 'text',
-                    inputMode: 'numeric',
-                    value: customRoundsInput || (state.isCustomRounds && ROUND_PRESETS.indexOf(state.roundConfig) === -1 ? state.roundConfig : ''),
-                    onChange: handleCustomInputChange,
-                    placeholder: '#',
-                    maxLength: 2,
-                    className: 'input input-small'
-                  }),
-                  React.createElement('span', { style: { color: 'var(--text-secondary)' } }, 'rounds')
-                )
-              )
-            ),
-            React.createElement(HowToPlay),
-            React.createElement('button', { onClick: function() { dispatch({ type: 'START_GAME' }); }, disabled: state.players.length < MIN_PLAYERS, className: 'btn btn-primary btn-large w-full' },
-              React.createElement(Play, { size: 24 }), ' Start Game'
             )
           )
         ),
